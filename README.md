@@ -10,13 +10,13 @@
 ### Microcontrollers:
 The board has two STM32F4-based microcontrollers, one called the NAV (navigation) computer and the other serving as the primary Flight Computer (FC).
 ### Onboard Sensors:
-**NAV's sensors and modules:**
+`**NAV's sensors and modules:**`
 - Inertial Measurement Unit (BMI088)    
 - Digital Pressure Sensor (BMP388)      
 - [Magnetometer (LIS3MDLTR)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/LIS3MDLTR_I2C)	
 - EEPROM (AT24C256C)			
 
-**FC's sensors and modules:**
+`**FC's sensors and modules:**`
 - Power Monitor (INA219)			
 - PWM Driver (PCA9685)				
 - FLASH (W25N01GV)				
