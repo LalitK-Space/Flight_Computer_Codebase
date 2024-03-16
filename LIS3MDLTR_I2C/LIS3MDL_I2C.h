@@ -75,7 +75,6 @@ void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle);
 void LIS3MDL_DeInit(I2C_HandleTypeDef *pI2CHandle);
 // Get Sensor Values
 float LIS3MDL_getTemperature_C(I2C_HandleTypeDef *pI2CHandle);
-void LIS3MDL_getMAG_XYZ(I2C_HandleTypeDef *pI2CHandle, int16_t *pMagXYZ); 
 int16_t LIS3MDL_getMAG_X(I2C_HandleTypeDef *pI2CHandle);
 int16_t LIS3MDL_getMAG_Y(I2C_HandleTypeDef *pI2CHandle);
 int16_t LIS3MDL_getMAG_Z(I2C_HandleTypeDef *pI2CHandle);
