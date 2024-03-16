@@ -96,9 +96,9 @@ void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
  * Parameter 3	:	Output Data Rate
  * Parameter 4	:	X, Y and Z axis Operating Mode
  * Parameter 5	:	Full-Scale Selection
- * Parameter 6	:	Measurement Mode
+ * Parameter 6	:	Measurement Modes
  * Return Type	:	none (void)
- * Note		:
+ * Note		: Possible arguments: MAG_TEMP_x, MAG_ODR_x, MAG_OM_x, MAG_FS_x, MAG_M_x
  * ------------------------------------------------------------------------------------------------------ */
 void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t ODR, int8_t xyzOM, int8_t FScale, int8_t measurementMode)
 {
@@ -228,11 +228,11 @@ void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t
 	}
 
 	/*- Measurement Mode Configuration  -*/
-	if (measurementMode == MAG_CONTINUOUS_CONV)
+	if (measurementMode == MAG_M_CONTINUOUS_CONV)
 	{
 		reg3Config &= ~(3<<0);
 	}
-	else if (measurementMode == MAG_SINGLE_CONV)
+	else if (measurementMode == MAG_M_SINGLE_CONV)
 	{
 		reg3Config &= ~(3<<0);
 		reg3Config |= (1<<0);
@@ -244,7 +244,6 @@ void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t
 	}
 
 	/*- Configure registers with user settings  -*/
-
 	HAL_I2C_Mem_Write(pI2CHandle, MAG_ADDRESS, CTRL_REG_1, I2C_MEMADD_SIZE_8BIT, &reg1Config, 1, HAL_MAX_DELAY);
 	HAL_I2C_Mem_Write(pI2CHandle, MAG_ADDRESS, CTRL_REG_2, I2C_MEMADD_SIZE_8BIT, &reg2Config, 1, HAL_MAX_DELAY);
 	HAL_I2C_Mem_Write(pI2CHandle, MAG_ADDRESS, CTRL_REG_3, I2C_MEMADD_SIZE_8BIT, &reg3Config, 1, HAL_MAX_DELAY);
