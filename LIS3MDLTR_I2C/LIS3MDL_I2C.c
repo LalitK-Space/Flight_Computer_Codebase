@@ -94,7 +94,7 @@ void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
  * Parameter 1	:	Pointer to I2C Handle
  * Parameter 2	:	Temperature Sensor Enable or Disable
  * Parameter 3	:	Output Data Rate
- * Parameter 4	:	X, Y and Z axis Operating Mode
+ * Parameter 4	:	X, Y, and Z axis Operating Mode
  * Parameter 5	:	Full-Scale Selection
  * Parameter 6	:	Measurement Modes
  * Return Type	:	none (void)
