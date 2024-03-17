@@ -11,7 +11,7 @@
 
 # How to use
 **Device Address:**
-<p>- If the sensor address differs from 0x1C, update it in the header file.
+<p>- If the sensor address differs from **0x1C**, update it in the header file. `MAG_ADDRESS`
 
 **Initialization:**
 - `LIS3MDL_DefaultInit(...)`
