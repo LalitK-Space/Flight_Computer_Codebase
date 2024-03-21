@@ -67,16 +67,18 @@
 #define MAG_TEMP_DI    (0)
 
 
-/*- LIS3DML APIs -*/
+/* LIS3DML APIs*/
 // Initialization
 void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t ODR, int8_t xyzOM, int8_t FScale, int8_t measurementMode);
 void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle);
 // DeInit
 void LIS3MDL_DeInit(I2C_HandleTypeDef *pI2CHandle);
+
 // Get Sensor Values
 float LIS3MDL_getTemperature_C(I2C_HandleTypeDef *pI2CHandle);
 int16_t LIS3MDL_getMAG_X(I2C_HandleTypeDef *pI2CHandle);
 int16_t LIS3MDL_getMAG_Y(I2C_HandleTypeDef *pI2CHandle);
 int16_t LIS3MDL_getMAG_Z(I2C_HandleTypeDef *pI2CHandle);
+uint8_t LIS3MDL_XYZ_DRDY(I2C_HandleTypeDef *pI2CHandle);
 
 #endif /* INC_LIS3MDL_I2C_H_ */
