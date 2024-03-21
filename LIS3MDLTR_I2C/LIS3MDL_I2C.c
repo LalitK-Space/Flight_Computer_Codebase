@@ -94,7 +94,7 @@ void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
  * Parameter 1	:	Pointer to I2C Handle
  * Parameter 2	:	Temperature Sensor Enable or Disable
  * Parameter 3	:	Output Data Rate
- * Parameter 4	:	X, Y, and Z axis Operating Mode
+ * Parameter 4	:	X, Y and Z axis Operating Mode
  * Parameter 5	:	Full-Scale Selection
  * Parameter 6	:	Measurement Modes
  * Return Type	:	none (void)
@@ -244,6 +244,7 @@ void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t
 	}
 
 	/*- Configure registers with user settings  -*/
+
 	HAL_I2C_Mem_Write(pI2CHandle, MAG_ADDRESS, CTRL_REG_1, I2C_MEMADD_SIZE_8BIT, &reg1Config, 1, HAL_MAX_DELAY);
 	HAL_I2C_Mem_Write(pI2CHandle, MAG_ADDRESS, CTRL_REG_2, I2C_MEMADD_SIZE_8BIT, &reg2Config, 1, HAL_MAX_DELAY);
 	HAL_I2C_Mem_Write(pI2CHandle, MAG_ADDRESS, CTRL_REG_3, I2C_MEMADD_SIZE_8BIT, &reg3Config, 1, HAL_MAX_DELAY);
@@ -268,6 +269,7 @@ void LIS3MDL_DeInit(I2C_HandleTypeDef *pI2CHandle)
 	HAL_I2C_Mem_Write(pI2CHandle,(0x1C << 1), 0x21, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
 
 }
+
 
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	LIS3MDL_getMAG_X
@@ -345,4 +347,26 @@ float LIS3MDL_getTemperature_C(I2C_HandleTypeDef *pI2CHandle)
 	// configure offset and scaling and return
 	return (((int16_t)(Out_H << 8) | Out_L) / 256.0f) + 25;
 
+}
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	XYZ_dataReady
+ * Description	:	Returns 1 if new data is available for X, Y and Z axis.
+ * Parameter 1	:	Pointer to I2C Handle
+ * Return Type	:	uint8_t 1 or 0
+ * Note		:	returns 1 if new set of data is available.
+ * ------------------------------------------------------------------------------------------------------ */
+uint8_t LIS3MDL_XYZ_DRDY(I2C_HandleTypeDef *pI2CHandle)
+{
+	uint8_t data = 0;
+	/*- Read Status Register -*/
+	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, STATUS_REG, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	/*- Check for ZYXDA bit -*/
+	if ((data>>3) & 0x01)
+	{
+		/*- A new set of data is available  -*/
+		return 1;
+	}
+	/*- A new set of data is not available yet  -*/
+	return 0;
 }
