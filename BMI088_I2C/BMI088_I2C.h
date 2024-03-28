@@ -1,7 +1,7 @@
 /*
  * 									BMI088_I2C.h
  *
- * This file contains all the LIS3MDL related APIs supported by the driver.
+ * This file contains all the BMI088 related APIs supported by the driver.
  *
  */
 
@@ -47,7 +47,7 @@
 #define ACC_ODR_25HZ	(2)
 #define ACC_ODR_50HZ	(3)
 #define ACC_ODR_100HZ	(4)
-#define ACC_ODR_200Z	(5)
+#define ACC_ODR_200HZ	(5)
 #define ACC_ODR_400HZ	(6)
 #define ACC_ODR_800HZ	(7)
 #define ACC_ODR_1600HZ	(8)
@@ -57,6 +57,11 @@
 #define ACC_RANGE_6G	(2)
 #define ACC_RANGE_12G	(3)
 #define ACC_RANGE_24G	(4)
+
+/* Accelerometer Low Pass Filter Bandwidth */
+#define ACC_BWP_4FOLD	(1)
+#define ACC_BWP_2FOLD	(2)
+#define ACC_BWP_NORMAL	(3)
 
 /* Gyroscope Registers Addresses */
 #define GYRO_CHIP_ID    (0x00)
@@ -76,13 +81,29 @@
 #define GYRO_INT3_INT4_IO_MAP    (0x18)
 #define GYRO_SELF_TEST    (0x3C)
 
+/* Gyroscope Output Data Rate (Hz) and Filter Bandwidth (Hz) */
+#define GYRO_ODR2000_BW532	(0x00)
+#define GYRO_ODR2000_BW230	(0x01)
+#define GYRO_ODR1000_BW116	(0x02)
+#define GYRO_ODR400_BW47	(0x03)
+#define GYRO_ODR200_BW23	(0x04)
+#define GYRO_ODR100_BW12	(0x05)
+#define GYRO_ODR200_BW64	(0x06)
+#define GYRO_ODR100_BW32	(0x07)
+
+/* Gyroscope Range */
+#define GYRO_FS_2000	(0x00)	/*- FS = ±2000°/s | Resolution = 16.384 LSB/°/s -*/
+#define GYRO_FS_1000	(0x01)	/*- FS = ±1000°/s | Resolution = 32.768 LSB/°/s -*/
+#define GYRO_FS_500		(0x02) 	/*- FS = ±500°/s | Resolution = 65.546 LSB/°/s -*/
+#define GYRO_FS_250		(0x03)	/*- FS = ±250°/s | Resolution = 131.072 LSB/°/s -*/
+#define GYRO_FS_125		(0x04)	/*- FS = ±125°/s | Resolution = 262.144 LSB/°/s -*/
 
 /* BMI088 APIs*/
 // Initialization
-void BMI_Acc_UserInit(I2C_HandleTypeDef *pI2CHandle);
+void BMI_Acc_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t acc_bwp, uint8_t acc_odr, uint8_t acc_range);
 void BMI_Acc_DefaultInit(I2C_HandleTypeDef *pI2CHandle);
 
-void BMI_Gyro_UserInit(I2C_HandleTypeDef *pI2CHandle);
+void BMI_Gyro_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t gyro_odr_bw, uint8_t gyro_range);
 void BMI_Gyro_DefaultInit(I2C_HandleTypeDef *pI2CHandle);
 
 // DeInit
@@ -92,13 +113,13 @@ void BMI_Gyro_DeInit(I2C_HandleTypeDef *pI2CHandle);
 // Get Sensor Values
 float BMI_getTemperature_C(I2C_HandleTypeDef *pI2CHandle);
 
-int16_t BMI_getAcc_X(I2C_HandleTypeDef *pI2CHandle);
-int16_t BMI_getAcc_Y(I2C_HandleTypeDef *pI2CHandle);
-int16_t BMI_getAcc_Z(I2C_HandleTypeDef *pI2CHandle);
+float BMI_getAcc_X(I2C_HandleTypeDef *pI2CHandle);
+float BMI_getAcc_Y(I2C_HandleTypeDef *pI2CHandle);
+float BMI_getAcc_Z(I2C_HandleTypeDef *pI2CHandle);
 
-int16_t BMI_getGyro_X(I2C_HandleTypeDef *pI2CHandle);
-int16_t BMI_getGyro_Y(I2C_HandleTypeDef *pI2CHandle);
-int16_t BMI_getGyro_Z(I2C_HandleTypeDef *pI2CHandle);
+float BMI_getGyro_X(I2C_HandleTypeDef *pI2CHandle);
+float BMI_getGyro_Y(I2C_HandleTypeDef *pI2CHandle);
+float BMI_getGyro_Z(I2C_HandleTypeDef *pI2CHandle);
 
 
 #endif /* INC_BMI088_I2C_H_ */
