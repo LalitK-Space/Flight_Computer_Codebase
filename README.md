@@ -12,7 +12,7 @@ The board has two STM32F4-based microcontrollers, one called the NAV (navigation
 ### Onboard Sensors:
 **`NAV's sensors and modules:`**
 - [Inertial Measurement Unit (BMI088)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/BMI088_I2C)	    
-- Digital Pressure Sensor (BMP388)      
+- [Digital Pressure Sensor (BMP388)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/BMP388_I2C)      
 - [Magnetometer (LIS3MDLTR)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/LIS3MDLTR_I2C)	
 - EEPROM (AT24C256C)			
 
