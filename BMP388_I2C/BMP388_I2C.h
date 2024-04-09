@@ -63,6 +63,53 @@
 #define	NVM_PAR_P10		(0x44)
 #define	NVM_PAR_P11		(0x45)
 
+/* IIR FIlter Coefficients */
+#define IIR_COEFF_0			(0x00)	/*- Bypass mode (no filtering) -*/
+#define IIR_COEFF_1			(0x01)
+#define IIR_COEFF_3			(0x02)
+#define IIR_COEFF_7			(0x03)
+#define IIR_COEFF_15		(0x04)
+#define IIR_COEFF_31		(0x05)
+#define IIR_COEFF_63		(0x06)
+#define IIR_COEFF_127		(0x07)
+
+/* ODR: Output Data Rate */
+#define ODR_200			(0x00)	/*- ODR: 200Hz 		| Pre-scaler: 1      | Sampling Period: 5ms     -*/
+#define ODR_200			(0x01)	/*- ODR: 100Hz 		| Pre-scaler: 2      | Sampling Period: 10ms    -*/
+#define ODR_50			(0x02)	/*- ODR: 50Hz  		| Pre-scaler: 4      | Sampling Period: 20ms    -*/
+#define ODR_25			(0x03)	/*- ODR: 25Hz  		| Pre-scaler: 8      | Sampling Period: 40ms    -*/
+#define ODR_12P5		(0x04)	/*- ODR: 25/2Hz 	| Pre-scaler: 16     | Sampling Period: 80ms    -*/
+#define ODR_6P25		(0x05)	/*- ODR: 25/4z 		| Pre-scaler: 32     | Sampling Period: 160ms   -*/
+#define ODR_3P1			(0x06)	/*- ODR: 25/8Hz 	| Pre-scaler: 64     | Sampling Period: 320ms   -*/
+#define ODR_1P5			(0x07)	/*- ODR: 25/16Hz 	| Pre-scaler: 127    | Sampling Period: 640ms   -*/
+#define ODR_0P78		(0x08)	/*- ODR: 25/32Hz 	| Pre-scaler: 256    | Sampling Period: 1.280s  -*/
+#define ODR_0P39		(0x09)	/*- ODR: 25/64Hz 	| Pre-scaler: 512    | Sampling Period: 2.560s  -*/
+#define ODR_0P2			(0x0A)	/*- ODR: 25/128Hz 	| Pre-scaler: 1024   | Sampling Period: 5.120s  -*/
+#define ODR_0P1			(0x0B)	/*- ODR: 25/256Hz   | Pre-scaler: 2048   | Sampling Period: 10.24s  -*/
+#define ODR_0P05		(0x0C)	/*- ODR: 25/512Hz   | Pre-scaler: 4096 	 | Sampling Period: 20.48s  -*/
+#define ODR_0P02		(0x0D)	/*- ODR: 25/1024Hz  | Pre-scaler: 8192   | Sampling Period: 40.96s  -*/
+#define ODR_0P01		(0x0E)	/*- ODR: 25/2048Hz  | Pre-scaler: 16384  | Sampling Period: 81.92s  -*/
+#define ODR_0P006		(0x0F)	/*- ODR: 25/4096Hz  | Pre-scaler: 32768  | Sampling Period: 163.84s -*/
+#define ODR_0P003		(0x10)	/*- ODR: 25/8192Hz 	| Pre-scaler: 65536  | Sampling Period: 327.68s -*/
+#define ODR_0P0015		(0x11)	/*- ODR: 25/16284Hz | Pre-scaler: 131072 | Sampling Period: 655.36s -*/
+
+/* OSR: Over Sampling */
+// Over-sampling setting for pressure measurement
+#define OSR_P_x1	(0x00)	/*- No Over-sampling -*/
+#define OSR_P_x2	(0x01)	/*- x2 Over-sampling -*/
+#define OSR_P_x4	(0x02)	/*- x4 Over-sampling -*/
+#define OSR_P_x8	(0x03)	/*- x8 Over-sampling -*/
+#define OSR_P_x16	(0x04)	/*- x16 Over-sampling -*/
+#define OSR_P_x32	(0x05)	/*- x32 Over-sampling -*/
+
+// Over-sampling setting for temperature measurement
+#define OSR_T_x1	(0x00)	/*- No Over-sampling -*/
+#define OSR_T_x2	(0x01)	/*- x2 Over-sampling -*/
+#define OSR_T_x4	(0x02)	/*- x4 Over-sampling -*/
+#define OSR_T_x8	(0x03)	/*- x8 Over-sampling -*/
+#define OSR_T_x16	(0x04)	/*- x16 Over-sampling -*/
+#define OSR_T_x32	(0x05)	/*- x32 Over-sampling -*/
+
 
 /* Trimming Coefficients for Output Compensation */
 typedef struct
@@ -90,7 +137,7 @@ typedef struct
 
 // Initialization
 void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle);
-void BMP_UserInit(I2C_HandleTypeDef *pI2CHandle);
+void BMP_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t osr_p, uint8_t osr_t, uint8_t odr, uint8_t iir_coeff);
 
 // DeInit
 void BMP_DeInit(I2C_HandleTypeDef *pI2CHandle);
