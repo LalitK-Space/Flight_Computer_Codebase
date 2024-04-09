@@ -21,8 +21,10 @@ static uint64_t compensatePressure(int32_t rawPress, compensationCoeff_t *pcompe
  * Return Type	:	none (void)
  * Note		:	In this initialization:
  * 				- Both Temperature and Pressure sensors are enabled
- * 				-
- * 				-
+ * 				- Over-sampling for pressure measurement is x2
+ * 				- Over-sampling for temperature measurement is x1 (No over-sampling)
+ * 				- ODR = 200Hz | Pre-scaler = 1 | Sampling Period = 5ms
+ * 				- IIR Filter is in Bypass mode (no filtering)
  * ------------------------------------------------------------------------------------------------------ */
 void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
 {
@@ -42,13 +44,20 @@ void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
 	HAL_I2C_Mem_Write(pI2CHandle,BMP388_ADDRESS, PWR_CTRL, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
 
 	/*- Over-sampling Settings: Temperature and Pressure measurements -*/
-		// 0x1C
+	/*- Default OSR configurations:
+	 *  	- osr_p (Over-sampling for pressure measurement) 	= x2
+	 *  	- osr_t (Over-sampling for temperature measurement) = x1 (no over-sampling)
+	 *  -*/
 
 	/*- Output Data Rate Configurations -*/
-		// 0x1D
+	/*- Default ODR configurations:
+	 *  	- ODR = 200Hz | Pre-scaler = 1 | Sampling Period = 5ms
+	 *  -*/
 
 	/*- IIR Filter Coefficients -*/
-		// 0x1F
+	/*- Default IIR Filter Coefficient:
+	 *  	- Bypass mode (no filtering)
+	 *  -*/
 
 }
 
@@ -57,13 +66,16 @@ void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
  * Name		:	BMP_UserInit
  * Description	:	Initialize BMP388 with user defined configuration
  * Parameter 1	:	Pointer to I2C Handle
- * Parameter 2	:	x
- * Parameter 3	:	x
- * Parameter 4	:	x
+ * Parameter 2	:	Over-sampling setting for pressure measurement
+ * Parameter 3	:	Over-sampling setting for temperature measurement
+ * Parameter 4	:	Output Data Rate
+ * Parameter 5	:	IIR FIlter Coefficients
  * Return Type	:	none (void)
- * Note		: Possible arguments:
+ * Note		:
+ * 			- Pressure and Temperature sensor is enabled.
+ * 			- Possible arguments: OSR_P_x, OSR_T_x, ODR_x, IIR_COEFF_x
  * ------------------------------------------------------------------------------------------------------ */
-void BMP_UserInit(I2C_HandleTypeDef *pI2CHandle)
+void BMP_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t osr_p, uint8_t osr_t, uint8_t odr, uint8_t iir_coeff)
 {
 	/*- DeInit before proceeding -*/
 	BMP_DeInit(pI2CHandle);
@@ -71,6 +83,27 @@ void BMP_UserInit(I2C_HandleTypeDef *pI2CHandle)
 	/*- Get trimming coefficients for output compensation -*/
 	compensationCoeff_t compCoeff;
 	get_compensationCoeff(pI2CHandle, &compCoeff);
+
+	uint8_t = 0;
+	/*- Power COntrol: Enable Temperature and Pressure sensor -*/
+	HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, PWR_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	data |= (1<<0);	// Enable Pressure Sensor
+	data |= (1<<1);	// Enable Temperature Sensor
+	data |= (3<<4);	// Mode: Normal
+	HAL_I2C_Mem_Write(pI2CHandle,BMP388_ADDRESS, PWR_CTRL, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
+
+	/*- Over-sampling Settings: Temperature and Pressure measurements -*/
+	data = 0;
+
+
+	/*- Output Data Rate Configurations -*/
+	data = 0;
+
+
+	/*- IIR Filter Coefficients -*/
+	data = 0;
+
+
 }
 
 
@@ -210,6 +243,7 @@ static void get_compensationCoeff(I2C_HandleTypeDef *pI2CHandle, compensationCoe
  * Parameter 1	:	Pointer to compensationCoeff_t structure Handle
  * Return Type	:	int64_t
  * Note		:	Calculations obtained from > boschsensortec/BMP3_SensorAPI
+ * 				(https://github.com/boschsensortec/BMP3_SensorAPI/blob/master/bmp3.c)
  * ------------------------------------------------------------------------------------------------------ */
 static int64_t compensateTemperature(int32_t rawTemp, compensationCoeff_t *pcompensationCoeff)
 {
@@ -224,6 +258,7 @@ static int64_t compensateTemperature(int32_t rawTemp, compensationCoeff_t *pcomp
  * Parameter 1	:	Pointer to compensationCoeff_t structure Handle
  * Return Type	:	uint64_t
  * Note		:	Calculations obtained from > boschsensortec/BMP3_SensorAPI
+ * 				(https://github.com/boschsensortec/BMP3_SensorAPI/blob/master/bmp3.c)
  * ------------------------------------------------------------------------------------------------------ */
 static uint64_t compensatePressure(int32_t rawPress, compensationCoeff_t *pcompensationCoeff)
 {
