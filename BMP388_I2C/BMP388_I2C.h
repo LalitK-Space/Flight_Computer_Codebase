@@ -75,7 +75,7 @@
 
 /* ODR: Output Data Rate */
 #define ODR_200			(0x00)	/*- ODR: 200Hz 		| Pre-scaler: 1      | Sampling Period: 5ms     -*/
-#define ODR_200			(0x01)	/*- ODR: 100Hz 		| Pre-scaler: 2      | Sampling Period: 10ms    -*/
+#define ODR_100			(0x01)	/*- ODR: 100Hz 		| Pre-scaler: 2      | Sampling Period: 10ms    -*/
 #define ODR_50			(0x02)	/*- ODR: 50Hz  		| Pre-scaler: 4      | Sampling Period: 20ms    -*/
 #define ODR_25			(0x03)	/*- ODR: 25Hz  		| Pre-scaler: 8      | Sampling Period: 40ms    -*/
 #define ODR_12P5		(0x04)	/*- ODR: 25/2Hz 	| Pre-scaler: 16     | Sampling Period: 80ms    -*/
@@ -95,20 +95,20 @@
 
 /* OSR: Over Sampling */
 // Over-sampling setting for pressure measurement
-#define OSR_P_x1	(0x00)	/*- No Over-sampling -*/
-#define OSR_P_x2	(0x01)	/*- x2 Over-sampling -*/
-#define OSR_P_x4	(0x02)	/*- x4 Over-sampling -*/
-#define OSR_P_x8	(0x03)	/*- x8 Over-sampling -*/
-#define OSR_P_x16	(0x04)	/*- x16 Over-sampling -*/
-#define OSR_P_x32	(0x05)	/*- x32 Over-sampling -*/
+#define OSR_P_x1	(0x0)	/*- No Over-sampling -*/
+#define OSR_P_x2	(0x1)	/*- x2 Over-sampling -*/
+#define OSR_P_x4	(0x2)	/*- x4 Over-sampling -*/
+#define OSR_P_x8	(0x3)	/*- x8 Over-sampling -*/
+#define OSR_P_x16	(0x4)	/*- x16 Over-sampling -*/
+#define OSR_P_x32	(0x5)	/*- x32 Over-sampling -*/
 
 // Over-sampling setting for temperature measurement
-#define OSR_T_x1	(0x00)	/*- No Over-sampling -*/
-#define OSR_T_x2	(0x01)	/*- x2 Over-sampling -*/
-#define OSR_T_x4	(0x02)	/*- x4 Over-sampling -*/
-#define OSR_T_x8	(0x03)	/*- x8 Over-sampling -*/
-#define OSR_T_x16	(0x04)	/*- x16 Over-sampling -*/
-#define OSR_T_x32	(0x05)	/*- x32 Over-sampling -*/
+#define OSR_T_x1	(0x0)	/*- No Over-sampling -*/
+#define OSR_T_x2	(0x1)	/*- x2 Over-sampling -*/
+#define OSR_T_x4	(0x2)	/*- x4 Over-sampling -*/
+#define OSR_T_x8	(0x3)	/*- x8 Over-sampling -*/
+#define OSR_T_x16	(0x4)	/*- x16 Over-sampling -*/
+#define OSR_T_x32	(0x5)	/*- x32 Over-sampling -*/
 
 
 /* Trimming Coefficients for Output Compensation */
