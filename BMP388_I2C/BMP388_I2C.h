@@ -13,6 +13,7 @@
 /* MCU Specific Header file */
 #include "stm32f4xx_hal.h"
 #include <stdint.h>
+#include <math.h>
 
 /* BMP388 I2C Address */
 #define BMP388_ADDRESS	(0x76 << 1)
