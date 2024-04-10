@@ -12,7 +12,7 @@ static void get_compensationCoeff(I2C_HandleTypeDef *pI2CHandle, compensationCoe
 static int64_t compensateTemperature(int32_t rawTemp, compensationCoeff_t *pcompensationCoeff);
 static uint64_t compensatePressure(int32_t rawPress, compensationCoeff_t *pcompensationCoeff);
 
-
+compensationCoeff_t compCoeff;
 
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	BMP_DefaultInit
@@ -21,7 +21,7 @@ static uint64_t compensatePressure(int32_t rawPress, compensationCoeff_t *pcompe
  * Return Type	:	none (void)
  * Note		:	In this initialization:
  * 				- Both Temperature and Pressure sensors are enabled
- * 				- Over-sampling for pressure measurement is x2
+ * 				- Over-sampling for pressure measurement is x4
  * 				- Over-sampling for temperature measurement is x1 (No over-sampling)
  * 				- ODR = 200Hz | Pre-scaler = 1 | Sampling Period = 5ms
  * 				- IIR Filter is in Bypass mode (no filtering)
@@ -32,7 +32,6 @@ void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
 	BMP_DeInit(pI2CHandle);
 
 	/*- Get trimming coefficients for output compensation -*/
-	compensationCoeff_t compCoeff;
 	get_compensationCoeff(pI2CHandle, &compCoeff);
 
 	uint8_t data = 0;
@@ -45,7 +44,7 @@ void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
 
 	/*- Over-sampling Settings: Temperature and Pressure measurements -*/
 	/*- Default OSR configurations:
-	 *  	- osr_p (Over-sampling for pressure measurement) 	= x2
+	 *  	- osr_p (Over-sampling for pressure measurement) 	= x4
 	 *  	- osr_t (Over-sampling for temperature measurement) = x1 (no over-sampling)
 	 *  -*/
 
@@ -72,6 +71,7 @@ void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
  * Parameter 5	:	IIR FIlter Coefficients
  * Return Type	:	none (void)
  * Note		:
+ * 			- Please follow recommended values to get proper and valid readings.
  * 			- Pressure and Temperature sensor is enabled.
  * 			- Possible arguments: OSR_P_x, OSR_T_x, ODR_x, IIR_COEFF_x
  * ------------------------------------------------------------------------------------------------------ */
@@ -81,28 +81,44 @@ void BMP_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t osr_p, uint8_t osr_t, u
 	BMP_DeInit(pI2CHandle);
 
 	/*- Get trimming coefficients for output compensation -*/
-	compensationCoeff_t compCoeff;
 	get_compensationCoeff(pI2CHandle, &compCoeff);
 
-	uint8_t = 0;
-	/*- Power COntrol: Enable Temperature and Pressure sensor -*/
+	uint8_t data = 0;
+	/*- Power Control: Enable Temperature and Pressure sensor -*/
 	HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, PWR_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	data |= (1<<0);	// Enable Pressure Sensor
 	data |= (1<<1);	// Enable Temperature Sensor
-	data |= (3<<4);	// Mode: Normal
 	HAL_I2C_Mem_Write(pI2CHandle,BMP388_ADDRESS, PWR_CTRL, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
+
 
 	/*- Over-sampling Settings: Temperature and Pressure measurements -*/
 	data = 0;
-
+	HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, OSR, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	data &= ~(0x3F);		// Bits[7:6] are Reserved
+	data |= (osr_p << 0);	// Configure OS for Pressure measurement
+	data |= (osr_t << 3);	// Configure OS for Temperature measurement
+	HAL_I2C_Mem_Write(pI2CHandle,BMP388_ADDRESS, OSR, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
 
 	/*- Output Data Rate Configurations -*/
 	data = 0;
+	HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, ODR, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	data &= ~(0x1F);		// Bits[7:5] are Reserved
+	data |= (odr << 0);		// Configure ODR
+	HAL_I2C_Mem_Write(pI2CHandle,BMP388_ADDRESS, ODR, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
+
+	/*- Power Control: Mode = Normal [Need to be done here] -*/
+	data = 0;
+	HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, PWR_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	data |= (3<<4);	// Mode: Normal
+	HAL_I2C_Mem_Write(pI2CHandle,BMP388_ADDRESS, PWR_CTRL, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
 
 
 	/*- IIR Filter Coefficients -*/
 	data = 0;
-
+	HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, CONFIG, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	data &= ~(7<<1);			// Bits[7:4] and bit[1] are Reserved
+	data |= (iir_coeff << 1);	// Configure Filter Coefficient
+	HAL_I2C_Mem_Write(pI2CHandle,BMP388_ADDRESS, CONFIG, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
 
 }
 
@@ -133,7 +149,19 @@ void BMP_DeInit(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 float BMP_getTemperature_C(I2C_HandleTypeDef *pI2CHandle)
 {
-	return 0;
+	uint8_t data[3];
+	int32_t rawTemp;
+	int64_t compensatedTemp;
+
+	/* Get Raw Temperature value */
+	HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, DATA_3, I2C_MEMADD_SIZE_8BIT, data, 3, HAL_MAX_DELAY);
+	rawTemp = (int32_t)(data[2] << 16) | (int32_t)(data[1] << 8) | (data[0]);
+
+	/* Get Compensated Temperature value */
+	compensatedTemp = compensateTemperature(rawTemp, &compCoeff);
+
+	/* Return Compensated Temperature in float and degree celsius */
+	return (float) compensatedTemp/100;
 }
 
 
@@ -146,7 +174,19 @@ float BMP_getTemperature_C(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 float BMP_getPressure_Pa(I2C_HandleTypeDef *pI2CHandle)
 {
-	return 0;
+	uint8_t data[3];
+	int32_t rawPress;
+	int64_t compensatedPress;
+
+	/* Get Raw Pressure value */
+	HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, DATA_0, I2C_MEMADD_SIZE_8BIT, data, 3, HAL_MAX_DELAY);
+	rawPress = (int32_t)(data[2] << 16) | (int32_t)(data[1] << 8) | (data[0]);
+
+	/* Get Compensated Pressure value */
+	compensatedPress = compensatePressure(rawPress, &compCoeff);
+
+	/* Return Compensated Pressure in float and Pascal */
+	return (float) compensatedPress/100;
 }
 
 
@@ -247,7 +287,29 @@ static void get_compensationCoeff(I2C_HandleTypeDef *pI2CHandle, compensationCoe
  * ------------------------------------------------------------------------------------------------------ */
 static int64_t compensateTemperature(int32_t rawTemp, compensationCoeff_t *pcompensationCoeff)
 {
-	;
+	/* Temporary variables for calculation */
+	  int64_t partial_data1;
+	  int64_t partial_data2;
+	  int64_t partial_data3;
+	  int64_t partial_data4;
+	  int64_t partial_data5;
+	  int64_t partial_data6;
+	  int64_t compensatedTemp;
+
+	  /* Compensating Raw Temperature data */
+	  partial_data1 = ((int64_t)rawTemp - (256 * pcompensationCoeff->PAR_T1));
+	  partial_data2 = pcompensationCoeff->PAR_T2 * partial_data1;
+	  partial_data3 = (partial_data1 * partial_data1);
+	  partial_data4 = (int64_t)partial_data3 * pcompensationCoeff->PAR_T3;
+	  partial_data5 = ((int64_t)(partial_data2 * 262144) + partial_data4);
+	  partial_data6 = partial_data5 / 4294967296;
+	  // Saving partial_data6 for pressure compensation calculations
+	  pcompensationCoeff->t_lin = partial_data6;
+
+	  compensatedTemp = (int64_t)((partial_data6 * 25) / 16384);
+
+	  return compensatedTemp;
+
 }
 
 
@@ -262,5 +324,45 @@ static int64_t compensateTemperature(int32_t rawTemp, compensationCoeff_t *pcomp
  * ------------------------------------------------------------------------------------------------------ */
 static uint64_t compensatePressure(int32_t rawPress, compensationCoeff_t *pcompensationCoeff)
 {
-	;
+	/* Temporary variables for calculation */
+	int64_t partial_data1;
+	int64_t partial_data2;
+	int64_t partial_data3;
+	int64_t partial_data4;
+	int64_t partial_data5;
+	int64_t partial_data6;
+	int64_t offset;
+	int64_t sensitivity;
+	uint64_t compensatedPress;
+
+	/* Compensating Raw Pressure data */
+	partial_data1 = pcompensationCoeff->t_lin * pcompensationCoeff->t_lin;
+	partial_data2 = partial_data1 / 64;
+	partial_data3 = (partial_data2 * pcompensationCoeff->t_lin) / 256;
+	partial_data4 = (pcompensationCoeff->PAR_P8 * partial_data3) / 32;
+	partial_data5 = (pcompensationCoeff->PAR_P7 * partial_data1) * 16;
+	partial_data6 = (pcompensationCoeff->PAR_P6 * pcompensationCoeff->t_lin) * 4194304;
+	offset = (pcompensationCoeff->PAR_P5 * 140737488355328) + partial_data4 + partial_data5 + partial_data6;
+	partial_data2 = (pcompensationCoeff->PAR_P4 * partial_data3) / 32;
+	partial_data4 = (pcompensationCoeff->PAR_P3 * partial_data1) * 4;
+	partial_data5 = (pcompensationCoeff->PAR_P2 - 16384) * pcompensationCoeff->t_lin * 2097152;
+	sensitivity = ((pcompensationCoeff->PAR_P1 - 16384) * 70368744177664) + partial_data2 + partial_data4 + partial_data5;
+	partial_data1 = (sensitivity / 16777216) * rawPress;
+	partial_data2 = pcompensationCoeff->PAR_P10 * pcompensationCoeff->t_lin;
+	partial_data3 = partial_data2 + (65536 * pcompensationCoeff->PAR_P9);
+	partial_data4 = (partial_data3 * rawPress) / 8192;
+    /* dividing by 10 followed by multiplying by 10
+     * To avoid overflow caused by (uncomp_data->pressure * partial_data4)
+     */
+	partial_data5 = (rawPress * (partial_data4 / 10)) / 512;
+	partial_data5 = partial_data5 * 10;
+	partial_data6 = (int64_t)((uint64_t)rawPress * (uint64_t)rawPress);
+	partial_data2 = (pcompensationCoeff->PAR_P11 * partial_data6) / 65536;
+	partial_data3 = (partial_data2 * rawPress) / 128;
+	partial_data4 = (offset / 4) + partial_data1 + partial_data5 + partial_data3;
+
+	compensatedPress = (((uint64_t)partial_data4 * 25) / (uint64_t)1099511627776);
+
+	return compensatedPress;
+
 }
