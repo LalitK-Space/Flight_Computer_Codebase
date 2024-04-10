@@ -196,11 +196,17 @@ float BMP_getPressure_Pa(I2C_HandleTypeDef *pI2CHandle)
  * Parameter 1	:	Pointer to I2C Handle
  * Parameter 2	:	Sea level pressure in hPa
  * Return Type	:	float
- * Note		:	Calculations obtained from > adafruit/Adafruit_BMP3XX
+ * Note		:	Calculations obtained from > adafruit/Adafruit_BMP3XX and BMP180 Datasheet.
  * ------------------------------------------------------------------------------------------------------ */
 float BMP_getAltitude_m(I2C_HandleTypeDef *pI2CHandle, float seaLevel_hPa)
 {
-	return 0;
+	float measuredPress = 0;
+	float altitude = 0;
+
+	measuredPress = (BMP_getPressure_Pa(pI2CHandle) / 100.0);	// /100 to convert Pa to hPa
+	altitude = 44330.0f * (1.0f - pow((measuredPress / seaLevel_hPa), (1/5.225)));
+
+	return altitude;
 }
 
 
