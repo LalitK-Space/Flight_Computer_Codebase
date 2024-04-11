@@ -39,7 +39,7 @@ Users can configure the following:
 
 >BMI088_I2C.h contains the possible arguements for each user configuration.
 
-NOTEL: This User Initialization *`BMI_Acc_UserInit(&hi2cx, ACC_BWP_NORMAL, ACC_ODR_100HZ, ACC_RANGE_6G);`* is same as *`BMI_Acc_DefaultInit(&hi2cx);`*
+NOTE: This User Initialization *`BMI_Acc_UserInit(&hi2cx, ACC_BWP_NORMAL, ACC_ODR_100HZ, ACC_RANGE_6G);`* is same as *`BMI_Acc_DefaultInit(&hi2cx);`*
 
 
 *BMI_Gyro_DefaultInit(...)* 
