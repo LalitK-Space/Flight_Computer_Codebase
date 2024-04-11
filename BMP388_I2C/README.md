@@ -1,4 +1,4 @@
-# Digital Pressure Sensor [BMI088]
+# Digital Pressure Sensor [BMP388]
 
 > This repository contains drivers for BMP388 (Digital Pressure Sensor) for I2C communication.
 
@@ -36,7 +36,7 @@ Pressure and Temperature sensors are enabled and users can configure the followi
 - Output Data Rate
 - IIR Filter Coefficients
 
->BMI088_I2C.h contains the possible arguements for each user configuration.
+>BMP388_I2C.h contains the possible arguements for each user configuration.
 
 NOTE: 
 - This User Initialization *`BMP_UserInit(&hi2cx, OSR_P_x4, OSR_T_x1, ODR_200, IIR_COEFF_0);`* is same as *`BMP_DefaultInit(&hi2cx);`*
