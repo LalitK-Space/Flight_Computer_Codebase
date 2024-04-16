@@ -17,7 +17,7 @@ The board has two STM32F4-based microcontrollers, one called the NAV (navigation
 - EEPROM (AT24C256C)			
 
 **`FC's sensors and modules:`**
-- Power Monitor (INA219)			
+- [Power Monitor (INA219)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/INA219_I2C)		
 - PWM Driver (PCA9685)				
 - FLASH (W25N01GV)				
 - EEPROM (AT24C256C)				
