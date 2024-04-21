@@ -148,7 +148,15 @@ void INA219_setCalibration_16V_400mA(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 void INA219_DeInit(I2C_HandleTypeDef *pI2CHandle)
 {
-	;
+	uint8_t data[2];
+	uint16_t dataR = 0;
+
+	/*- Set: reset bit -*/
+	dataR |= (1<<15);
+	data[0] = ((dataR >> 8) & 0xFF);
+	data[1] = ((dataR >> 0) & 0xFF);
+	HAL_I2C_Mem_Write(pI2CHandle, INA219_ADDRESS, INA219_CONFIGURATION, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	/*- This bit self clears -*/
 }
 
 
