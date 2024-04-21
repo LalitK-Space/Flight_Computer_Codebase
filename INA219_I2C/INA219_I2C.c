@@ -203,7 +203,7 @@ float INA219_getBusVoltage_V(I2C_HandleTypeDef *pI2CHandle)
 
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	INA219_getPower_mW
- * Description	:	Returns power in milli-Watts (Pa)
+ * Description	:	Returns power in milli-Watts (mW)
  * Parameter 1	:	Pointer to I2C Handle
  * Return Type	:	float
  * Note		:
