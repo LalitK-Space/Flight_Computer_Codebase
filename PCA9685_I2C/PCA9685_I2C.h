@@ -19,10 +19,9 @@
 #define PCA_OSCILLATOR_FREQ	(25000000)	/* PCA Internal Oscillator Frequency */
 #define PCA_PRESCALE_MIN	(3)
 #define PCA_PRESCALE_MAX	(255)
-#define PCA_MAX_PWM_FREQUENCY	(3052)	        /* frequency_max => 50MHz / (4096 * (PCA_PRESCALE_MIN + 1)) = ~3052 Hz */
 
 /* Servo Control */
-/*- Calculate SERVO_MIN and SERVO_MAX for your servos [Range: [0-4096] ON and OFF Time/Length] -*/
+/*- Calculate SERVO_MIN and SERVO_MAX for your servos [Range: [0-4096] ON and OFF Time/Count/Length] -*/
 #define SERVO_MAX	        (0)
 #define SERVO_MIN	        (0)
 #define SERVO_ANGLE_MIN	        (0)
@@ -41,25 +40,35 @@
 #define PCA_ALL_LED_OFF_L	(0xFC)
 #define PCA_ALL_LED_OFF_H	(0xFD)
 #define PCA_PRE_SCALE	        (0xFE)
-#define PCA_TESTMODE	        (0xFF)
 
-/* Output Configurations */
-#define PCA_OUTDRV_OPENDRAIN	(0x0)
-#define PCA_OUTDRV_TOTEMPOLE	(0x1)
+/* PCA9685 PWM Output Ports */
+#define PCA_PORT0	        (0x0)
+#define PCA_PORT1	        (0x1)
+#define PCA_PORT2	        (0x2)
+#define PCA_PORT3	        (0x3)
+#define PCA_PORT4	        (0x4)
+#define PCA_PORT5	        (0x5)
+#define PCA_PORT6	        (0x6)
+#define PCA_PORT7	        (0x7)
+#define PCA_PORT8	        (0x8)
+#define PCA_PORT9	        (0x9)
+#define PCA_PORT10	        (0xA)
+#define PCA_PORT11	        (0xB)
+#define PCA_PORT12	        (0xC)
+#define PCA_PORT13	        (0xD)
+#define PCA_PORT14	        (0xE)
+#define PCA_PORT15	        (0xF)
 
 /* PCA9685 APIs*/
 
 // Initialization
-void PCA_Init(I2C_HandleTypeDef *pI2CHandle, uint8_t pwmFrequency);
-
-// DeInit
-void PCA_DeInit(I2C_HandleTypeDef *pI2CHandle);
+void PCA_Init(I2C_HandleTypeDef *pI2CHandle, uint16_t pwmFrequency);
 
 // Control
 void PCA_sleep(I2C_HandleTypeDef *pI2CHandle);
-void PCA_setPWM(I2C_HandleTypeDef *pI2CHandle, uint8_t channel, uint16_t ONlength, uint16_t OFFlength);
-void PCA_setPWMtoAll(I2C_HandleTypeDef *pI2CHandle, uint16_t ONlength, uint16_t OFFlength);
-void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t angle);
+void PCA_setPWM(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint16_t ONcount, uint16_t OFFcount);
+void PCA_setPWMtoAll(I2C_HandleTypeDef *pI2CHandle, uint16_t ONcount, uint16_t OFFcount);
+void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angle);
 
 
 #endif /* INC_PCA9685_I2C_H_ */
