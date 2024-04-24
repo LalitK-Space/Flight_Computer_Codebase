@@ -22,8 +22,8 @@
 
 /* Servo Control */
 /*- Calculate SERVO_MIN and SERVO_MAX for your servos [Range: [0-4096] ON and OFF Time/Count/Length] -*/
-#define SERVO_MAX	        (0)
-#define SERVO_MIN	        (0)
+#define SERVO_MAX	        (475)	/*- Set carefully | puts servo at 180 Degrees -*/
+#define SERVO_MIN	        (75)	/*- Set carefully | puts servo at 0 degrees -*/
 #define SERVO_ANGLE_MIN	        (0)
 #define SERVO_ANGLE_MAX	        (180)
 
@@ -42,22 +42,22 @@
 #define PCA_PRE_SCALE	        (0xFE)
 
 /* PCA9685 PWM Output Ports */
-#define PCA_PORT0	        (0x0)
-#define PCA_PORT1	        (0x1)
-#define PCA_PORT2	        (0x2)
-#define PCA_PORT3	        (0x3)
-#define PCA_PORT4	        (0x4)
-#define PCA_PORT5	        (0x5)
-#define PCA_PORT6	        (0x6)
-#define PCA_PORT7	        (0x7)
-#define PCA_PORT8	        (0x8)
-#define PCA_PORT9	        (0x9)
-#define PCA_PORT10	        (0xA)
-#define PCA_PORT11	        (0xB)
-#define PCA_PORT12	        (0xC)
-#define PCA_PORT13	        (0xD)
-#define PCA_PORT14	        (0xE)
-#define PCA_PORT15	        (0xF)
+#define PCA_PORT0	(0x0)
+#define PCA_PORT1	(0x1)
+#define PCA_PORT2	(0x2)
+#define PCA_PORT3	(0x3)
+#define PCA_PORT4	(0x4)
+#define PCA_PORT5	(0x5)
+#define PCA_PORT6	(0x6)
+#define PCA_PORT7	(0x7)
+#define PCA_PORT8	(0x8)
+#define PCA_PORT9	(0x9)
+#define PCA_PORT10	(0xA)
+#define PCA_PORT11	(0xB)
+#define PCA_PORT12	(0xC)
+#define PCA_PORT13	(0xD)
+#define PCA_PORT14	(0xE)
+#define PCA_PORT15	(0xF)
 
 /* PCA9685 APIs*/
 
