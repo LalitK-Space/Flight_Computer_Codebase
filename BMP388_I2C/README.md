@@ -9,6 +9,8 @@
 **`BMP388_I2C.c`**
 <p> Implementation of supported functions.
 
+# How to use
+
 **Device Address:**
 <p>- If the sensors' addresses differ from the default, update it in the header file.
 
