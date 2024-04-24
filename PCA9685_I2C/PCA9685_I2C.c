@@ -8,6 +8,8 @@
 #include "PCA9685_I2C.h"
 
 
+/*- Helper Function:  -*/
+static uint16_t map_OffcountToAngle(uint16_t OFFcount, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max);
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	PCA_Init
  * Description	:	Initialize PCA9685 with user defined PWM frequency
@@ -77,7 +79,7 @@ void PCA_Init(I2C_HandleTypeDef *pI2CHandle, uint16_t pwmFrequency)
  * Description	:	Put PCA9685 to sleep
  * Parameter 1	:	Pointer to I2C Handle
  * Return Type	:	none (void)
- * Note		:	x
+ * Note		:
  * ------------------------------------------------------------------------------------------------------ */
 void PCA_sleep(I2C_HandleTypeDef *pI2CHandle)
 {
@@ -114,7 +116,7 @@ void PCA_setPWM(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint16_t ONcount, u
 
 	/*- Calculating address of out PWM port -*/
 	portAddress = PCA_LED0_ON_L + 4 * port;
-	/*- Writing to desired port -*/
+	/*- Write to desired port -*/
 	HAL_I2C_Mem_Write(pI2CHandle, PCA9685_ADDRESS, portAddress, I2C_MEMADD_SIZE_8BIT, pwmData, 4, HAL_MAX_DELAY);
 }
 
@@ -138,22 +140,57 @@ void PCA_setPWMtoAll(I2C_HandleTypeDef *pI2CHandle, uint16_t ONcount, uint16_t O
 	pwmData[2] = OFFcount;
 	pwmData[3] = (OFFcount>>8);
 
-	/*- Writing to All ports -*/
+	/*- Write to All ports -*/
 	HAL_I2C_Mem_Write(pI2CHandle, PCA9685_ADDRESS, PCA_ALL_LED_ON_L, I2C_MEMADD_SIZE_8BIT, pwmData, 4, HAL_MAX_DELAY);
 }
 
 
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	PCA_setServoAngle
- * Description	:	x
+ * Description	:	Set servo angle
  * Parameter 1	:	Pointer to I2C Handle
- * Parameter 2	:	x
- * Parameter 3	:	x
+ * Parameter 2	:	PWM Output Port [0:15]
+ * Parameter 3	:	Angle [0:180]
  * Return Type	:	none (void)
  * Note		:
- * 			- x
+ * 			-
  * ------------------------------------------------------------------------------------------------------ */
 void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angle)
 {
-	;
+	/*- Calculate PWM OFFcount based on angle -*/
+	uint16_t pwmOffcount = map_OffcountToAngle(angle, SERVO_ANGLE_MIN, SERVO_ANGLE_MAX, SERVO_MIN, SERVO_MAX);
+
+	PCA_setPWM(pI2CHandle, port, 0, pwmOffcount);
+
+}
+
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	map_OffcountToAngle
+ * Description	:	Static function to map PWM pulse width (OFFcount) to servo angle
+ * Parameter 1	:	OFF Time/Count [0-4096]
+ * Parameter 2	:	Minimum Servo Angle [SERVO_ANGLE_MIN]
+ * Parameter 3	:	Maximum Servo Angle [SERVO_ANGLE_MAX]
+ * Parameter 2	:	Minimum value of OFFcount to put servo at angle 0 degrees [SERVO_MIN]
+ * Parameter 3	:	Maximum value of OFFcount to put servo at angle 180 degrees [SERVO_MAX]
+ * Return Type	:	PWM pulse count (OFFcount) (void)
+ * Note		:
+ * 			-	similar to map() Arduino's function
+ * ------------------------------------------------------------------------------------------------------ */
+static uint16_t map_OffcountToAngle(uint16_t OFFcount, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max)
+
+{
+	/*- Ensuring values within range -*/
+    if (OFFcount < servoAngle_min)
+    {
+        OFFcount = servoAngle_min;
+    }
+    else if (OFFcount > servoAngle_max)
+    {
+        OFFcount = servoAngle_max;
+    }
+
+	/*- Scaling -*/
+    return (uint16_t) (OFFcount - servoAngle_min) * (servo_max - servo_min) / (servoAngle_max - servoAngle_min) + servo_min;
+
 }
