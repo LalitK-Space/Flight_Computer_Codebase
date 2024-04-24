@@ -43,7 +43,7 @@
 # Servo Control
 **Using PCA_setServoAngle() function**
 
-	This function uses values SERVO_MIN and SERVO_MAX to calculate the minimum and maximum PWM pulse length/count needed to put the servo at 0 and 180 degrees. 
+`This function uses values SERVO_MIN and SERVO_MAX to calculate the minimum and maximum PWM pulse length/count needed to put the servo at 0 and 180 degrees.` 
 - Given that these values can differ between servos, assigning them properly is essential. This ensures the servo operates within its safe range, avoiding any potential stress or damage.
 
 - To calculate the SERVO_MIN and SERVO_MAX for your servos, use `PCA_setPWM(&hi2cx, PCA_PORTx, 0, OFFcount)`, *OFFcount* ranges from 0 to 4096. By using different values of OFFcount, estimate the 0 and 180 degrees of your servo and update the SERVO_MIN and SERVO_MAX accordingly.
