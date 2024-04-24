@@ -10,6 +10,9 @@
 
 /*- Helper Function:  -*/
 static uint16_t map_OffcountToAngle(uint16_t OFFcount, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max);
+
+
+
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	PCA_Init
  * Description	:	Initialize PCA9685 with user defined PWM frequency
