@@ -58,6 +58,6 @@ PCA_setPWM(&hi2cx, PCA_PORTx, 0, SERVO_MIN) /* Should put your servo at 0 Degree
 PCA_setPWM(&hi2cx, PCA_PORTx, 0, SERVO_MAX) /* Should put your servo at 180 Degrees*/
 
 /* - Be careful not to put stress on your servos */
-/* - Let's say a value of SERVO_MIN as 100 puts your servo at 0 degrees; you must refrain from putting further stress on your servo by writing 101 and above. Same for SERVO_MAX. */
+/* - Let's say a value of SERVO_MIN as 100 puts your servo at 0 degrees; you must refrain from putting further stress on your servo by writing 99 or below. Same for SERVO_MAX. */
 
 ```
