@@ -14,13 +14,13 @@ The board has two STM32F4-based microcontrollers, one called the NAV (navigation
 - [Inertial Measurement Unit (BMI088)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/BMI088_I2C)	    
 - [Digital Pressure Sensor (BMP388)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/BMP388_I2C)      
 - [Magnetometer (LIS3MDLTR)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/LIS3MDLTR_I2C)	
-- EEPROM (AT24C256C)			
+- [EEPROM (AT24C256C)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/AT24Cxxx_I2C)				
 
 **`FC's sensors and modules:`**
 - [Power Monitor (INA219)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/INA219_I2C)		
 - [PWM Driver (PCA9685)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/PCA9685_I2C)
 - FLASH (W25N01GV)				
-- EEPROM (AT24C256C)				
+- [EEPROM (AT24C256C)](https://github.com/LalitK-Space/Flight_Computer_Codebase/tree/main/AT24Cxxx_I2C)					
 
 ## Drivers Information
 <p> This repository contains drivers for the sensors and modules listed, developed using  STM32 HAL (Hardware Abstraction Layer) and low-layer drivers.
