@@ -18,8 +18,9 @@
  * ------------------------------------------------------------------------------------------------------ */
 void EEPROM_Writebyte(I2C_HandleTypeDef *pI2CHandle, uint16_t address, uint8_t data)
 {
-	;
+	HAL_I2C_Mem_Write(pI2CHandle, EEPROM_x_ADDRESS, address, I2C_MEMADD_SIZE_16BIT, &data, 1, HAL_MAX_DELAY);
 }
+
 
 
 /* ------------------------------------------------------------------------------------------------------
@@ -32,8 +33,12 @@ void EEPROM_Writebyte(I2C_HandleTypeDef *pI2CHandle, uint16_t address, uint8_t d
  * ------------------------------------------------------------------------------------------------------ */
 uint8_t EEPROM_Readbyte(I2C_HandleTypeDef *pI2CHandle, uint16_t address)
 {
-	return 0;
+	uint8_t data = 0;
+	HAL_I2C_Mem_Read(pI2CHandle, EEPROM_x_ADDRESS, address, I2C_MEMADD_SIZE_16BIT, &data, 1, HAL_MAX_DELAY);
+
+	return data;
 }
+
 
 
 /* ------------------------------------------------------------------------------------------------------
@@ -48,8 +53,9 @@ uint8_t EEPROM_Readbyte(I2C_HandleTypeDef *pI2CHandle, uint16_t address)
  * ------------------------------------------------------------------------------------------------------ */
 void EEPROM_Write(I2C_HandleTypeDef *pI2CHandle, uint16_t address, uint8_t *pdata, uint16_t length)
 {
-	;
+	HAL_I2C_Mem_Write(pI2CHandle, EEPROM_x_ADDRESS, address, I2C_MEMADD_SIZE_16BIT, pdata, length, HAL_MAX_DELAY);
 }
+
 
 
 /* ------------------------------------------------------------------------------------------------------
@@ -64,5 +70,5 @@ void EEPROM_Write(I2C_HandleTypeDef *pI2CHandle, uint16_t address, uint8_t *pdat
  * ------------------------------------------------------------------------------------------------------ */
 void EEPROM_Read(I2C_HandleTypeDef *pI2CHandle, uint16_t address, uint8_t *pdata, uint16_t length)
 {
-	;
+	HAL_I2C_Mem_Read(pI2CHandle, EEPROM_x_ADDRESS, address, I2C_MEMADD_SIZE_16BIT, pdata, length, HAL_MAX_DELAY);
 }
