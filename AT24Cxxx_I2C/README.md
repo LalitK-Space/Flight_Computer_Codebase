@@ -25,21 +25,21 @@
 
 **Example**
 ```c
-  	/*- Write 1 byte of data at address 0x0000 -*/
-  	uint8_t writeData = 'L';
-  	EEPROM_Writebyte(&hi2cx, 0x0000, writeData);
+/*- Write 1 byte of data at address 0x0000 -*/
+uint8_t writeData = 'L';
+EEPROM_Writebyte(&hi2cx, 0x0000, writeData);
 
-  	/*- Read 1 byte of data from address 0x0000 -*/
-  	uint8_t readData = 0;
-  	readData = EEPROM_Readbyte(&hi2cx, 0x0000);
+/*- Read 1 byte of data from address 0x0000 -*/
+uint8_t readData = 0;
+readData = EEPROM_Readbyte(&hi2cx, 0x0000);
 
-  	/*- Writing a data buffer to an address starting from 0x0005 -*/
-  	uint8_t telemetry[50];
-    sprintf((char *)telemetry,"LalitK.space");
-  	uint16_t length = strlen((char*)telemetry);
-    EEPROM_Write(&hi2cx, 0x0005, telemetry, length);
+/*- Writing a data buffer to an address starting from 0x0005 -*/
+uint8_t telemetry[50];
+sprintf((char *)telemetry,"LalitK.space");
+uint16_t length = strlen((char*)telemetry);
+EEPROM_Write(&hi2cx, 0x0005, telemetry, length);
 
-  	/*- Reading a data buffer from address 0x0005 -*/
-  	uint8_t readTelemetry[50];
-  	EEPROM_Read(&hi2cx, 0x0005, readTelemetry, length);
+/*- Reading a data buffer from address 0x0005 -*/
+uint8_t readTelemetry[50];
+EEPROM_Read(&hi2cx, 0x0005, readTelemetry, length);
 ```
