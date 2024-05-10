@@ -100,7 +100,7 @@ void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
  * Return Type	:	none (void)
  * Note		: Possible arguments: MAG_TEMP_x, MAG_ODR_x, MAG_OM_x, MAG_FS_x, MAG_M_x
  * ------------------------------------------------------------------------------------------------------ */
-void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t ODR, int8_t xyzOM, int8_t FScale, int8_t measurementMode)
+void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t odr, int8_t xyzOM, int8_t FScale, int8_t measurementMode)
 {
 	/*- temporary variables to store registers contents  -*/
 	uint8_t reg1Config = 0;
@@ -129,36 +129,36 @@ void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t
 	}
 
 	/*- ODR Configuration  -*/
-	if (ODR == MAG_ODR_0_625HZ)
+	if (odr == MAG_ODR_0_625HZ)
 	{
 		reg1Config &= ~(7<<2);
 	}
-	else if (ODR == MAG_ODR_1_25HZ)
+	else if (odr == MAG_ODR_1_25HZ)
 	{
 		reg1Config &= ~(7<<2);
 		reg1Config |= (1<<2);
 	}
-	else if (ODR == MAG_ODR_2_5HZ)
+	else if (odr == MAG_ODR_2_5HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (1<<3);
 	}
-	else if (ODR == MAG_ODR_5HZ)
+	else if (odr == MAG_ODR_5HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (3<<2);
 	}
-	else if (ODR == MAG_ODR_10HZ)
+	else if (odr == MAG_ODR_10HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (1<<4);
 	}
-	else if (ODR == MAG_ODR_20HZ)
+	else if (odr == MAG_ODR_20HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (5<<2);
 	}
-	else if (ODR == MAG_ODR_40HZ)
+	else if (odr == MAG_ODR_40HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (3<<3);
