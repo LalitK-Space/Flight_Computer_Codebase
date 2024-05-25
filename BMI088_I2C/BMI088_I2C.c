@@ -10,6 +10,8 @@
 /*- Private Variables -*/
 static uint8_t accRange = 6; /* Default Accelerometer Range: ±6g */
 static uint16_t gyroRange = 2000; /* Default Gyroscope Range: ±2000°/s and Resolution 16.384 LSB/°/s */
+
+
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	BMI_Acc_UserInit
  * Description	:	Initialize BMI088-Accelerometer with user defined configuration
@@ -323,17 +325,15 @@ void BMI_Gyro_DeInit(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 float BMI_getAcc_X(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_MSB = 0;
-	uint8_t Out_LSB = 0;
 	int16_t accX = 0;
+	uint8_t data[2];
 
-	/*- Read register ACC_X_LSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_X_LSB, I2C_MEMADD_SIZE_8BIT, &Out_LSB, 1, HAL_MAX_DELAY);
-	/*- Read register ACC_X_MSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_X_MSB, I2C_MEMADD_SIZE_8BIT, &Out_MSB, 1, HAL_MAX_DELAY);
+	/*- Reading raw X Accelerometer value -*/
+	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_X_LSB, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	accX = ((int16_t)(data[1] << 8) | (data[0]));
 
-	accX = ((int16_t)(Out_MSB << 8) | Out_LSB);
-	return ((float)accX / 32768.0f * accRange * 9.81);
+	/*- Scaling and converting to m/s^2 -*/
+	return ((float)accX * ((accRange * 2) / 65536.0) * 9.80665);
 }
 
 
@@ -346,16 +346,15 @@ float BMI_getAcc_X(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 float BMI_getAcc_Y(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_MSB = 0;
-	uint8_t Out_LSB = 0;
 	int16_t accY = 0;
-	/*- Read register ACC_Y_LSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_Y_LSB, I2C_MEMADD_SIZE_8BIT, &Out_LSB, 1, HAL_MAX_DELAY);
-	/*- Read register ACC_Y_MSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_Y_MSB, I2C_MEMADD_SIZE_8BIT, &Out_MSB, 1, HAL_MAX_DELAY);
+	uint8_t data[2];
 
-	accY = ((int16_t)(Out_MSB << 8) | Out_LSB);
-	return ((float)accY / 32768.0f * accRange * 9.81);
+	/*- Reading raw Y Accelerometer value -*/
+	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_Y_LSB, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	accY = ((int16_t)(data[1] << 8) | (data[0]));
+
+	/*- Scaling and converting to m/s^2 -*/
+	return ((float)accY * ((accRange * 2) / 65536.0) * 9.80665);
 }
 
 
@@ -368,17 +367,15 @@ float BMI_getAcc_Y(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 float BMI_getAcc_Z(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_MSB = 0;
-	uint8_t Out_LSB = 0;
 	int16_t accZ = 0;
+	uint8_t data[2];
 
-	/*- Read register ACC_Z_LSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_Z_LSB, I2C_MEMADD_SIZE_8BIT, &Out_LSB, 1, HAL_MAX_DELAY);
-	/*- Read register ACC_Z_MSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_Z_MSB, I2C_MEMADD_SIZE_8BIT, &Out_MSB, 1, HAL_MAX_DELAY);
+	/*- Reading raw Z Accelerometer value -*/
+	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_Z_LSB, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	accZ = ((int16_t)(data[1] << 8) | (data[0]));
 
-	accZ = ((int16_t)(Out_MSB << 8) | Out_LSB);
-	return ((float)accZ / 32768.0f * accRange * 9.81);
+	/*- Scaling and converting to m/s^2 -*/
+	return ((float)accZ * ((accRange * 2) / 65536.0) * 9.80665);
 }
 
 
@@ -387,21 +384,19 @@ float BMI_getAcc_Z(I2C_HandleTypeDef *pI2CHandle)
  * Description	:	Returns angular velocity in X axis
  * Parameter 1	:	Pointer to I2C Handle
  * Return Type	:	float
- * Note		:
+ * Note		:	Output: Angular velocity (degree per second °/s)
  * ------------------------------------------------------------------------------------------------------ */
 float BMI_getGyro_X(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_MSB = 0;
-	uint8_t Out_LSB = 0;
 	int16_t rateX = 0;
+	uint8_t data[2];
 
-	/*- Read register RATE_X_LSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_X_LSB, I2C_MEMADD_SIZE_8BIT, &Out_LSB, 1, HAL_MAX_DELAY);
-	/*- Read register RATE_X_MSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_X_MSB, I2C_MEMADD_SIZE_8BIT, &Out_MSB, 1, HAL_MAX_DELAY);
+	/*- Reading raw X Gyroscope value -*/
+	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_X_LSB, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	rateX = (int16_t)(data[1] << 8) | (data[0]);
 
-	rateX = ((int16_t)(Out_MSB << 8) | Out_LSB);
-	return ((float) rateX / 32768.0f * gyroRange);
+	/*- Scaling and converting to °/s -*/
+	return ((float)rateX * ((gyroRange * 2) / 65536.0));
 }
 
 
@@ -414,17 +409,15 @@ float BMI_getGyro_X(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 float BMI_getGyro_Y(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_MSB = 0;
-	uint8_t Out_LSB = 0;
 	int16_t rateY = 0;
+	uint8_t data[2];
 
-	/*- Read register RATE_Y_LSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_Y_LSB, I2C_MEMADD_SIZE_8BIT, &Out_LSB, 1, HAL_MAX_DELAY);
-	/*- Read register RATE_Y_MSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_Y_MSB, I2C_MEMADD_SIZE_8BIT, &Out_MSB, 1, HAL_MAX_DELAY);
+	/*- Reading raw Y Gyroscope value -*/
+	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_Y_LSB, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	rateY = (int16_t)(data[1] << 8) | (data[0]);
 
-	rateY = ((int16_t)(Out_MSB << 8) | Out_LSB);
-	return ((float) rateY / 32768.0f * gyroRange);
+	/*- Scaling and converting to °/s -*/
+	return ((float)rateY * ((gyroRange * 2) / 65536.0));
 }
 
 
@@ -437,17 +430,15 @@ float BMI_getGyro_Y(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 float BMI_getGyro_Z(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_MSB = 0;
-	uint8_t Out_LSB = 0;
 	int16_t rateZ = 0;
+	uint8_t data[2];
 
-	/*- Read register RATE_Z_LSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_Z_LSB, I2C_MEMADD_SIZE_8BIT, &Out_LSB, 1, HAL_MAX_DELAY);
-	/*- Read register RATE_Z_MSB -*/
-	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_Z_MSB, I2C_MEMADD_SIZE_8BIT, &Out_MSB, 1, HAL_MAX_DELAY);
+	/*- Reading raw Z Gyroscope value -*/
+	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, RATE_Z_LSB, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	rateZ = (int16_t)(data[1] << 8) | (data[0]);
 
-	rateZ = ((int16_t)(Out_MSB << 8) | Out_LSB);
-	return ((float) rateZ / 32768.0f * gyroRange);
+	/*- Scaling and converting to °/s -*/
+	return ((float)rateZ * ((gyroRange * 2) / 65536.0));
 }
 
 
