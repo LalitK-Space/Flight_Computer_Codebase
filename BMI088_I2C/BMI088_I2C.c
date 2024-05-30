@@ -219,7 +219,7 @@ void BMI_Gyro_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t gyro_odr_bw, uint8
 
 	data |= gyro_range;
 
-	HAL_I2C_Mem_Write(pI2CHandle, ACC_ADDRESS, GYRO_RANGE, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(pI2CHandle, GYRO_ADDRESS, GYRO_RANGE, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 
 	/*- Gyroscope Bandwidth -*/
 	data = 0;
@@ -227,7 +227,7 @@ void BMI_Gyro_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t gyro_odr_bw, uint8
 
 	data |= gyro_odr_bw;
 
-	HAL_I2C_Mem_Write(pI2CHandle, ACC_ADDRESS, GYRO_BANDWIDTH, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(pI2CHandle, GYRO_ADDRESS, GYRO_BANDWIDTH, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 
 	/*- Setting private variable gyroRange for data calculations -*/
 	if (gyro_range == GYRO_FS_1000)
@@ -290,7 +290,6 @@ void BMI_Acc_DeInit(I2C_HandleTypeDef *pI2CHandle)
 {
 	uint8_t data = 0;
 	/*- Soft Reset: Accelerometer -*/
-	HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_SOFTRESET, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	data |= (0xB6);
 	HAL_I2C_Mem_Write(pI2CHandle, ACC_ADDRESS, ACC_SOFTRESET, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	HAL_Delay(10);
@@ -308,7 +307,6 @@ void BMI_Gyro_DeInit(I2C_HandleTypeDef *pI2CHandle)
 {
 	uint8_t data = 0;
 	/*- Soft Reset: Gyroscope -*/
-	HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, GYRO_SOFTRESET, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	data |= (0xB6);
 	HAL_I2C_Mem_Write(pI2CHandle, GYRO_ADDRESS, GYRO_SOFTRESET, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	HAL_Delay(50);
