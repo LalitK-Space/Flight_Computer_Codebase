@@ -53,11 +53,11 @@ NOTEL: This User Initialization *`LIS3MDL_UserInit(&hi2cx, MAG_TEMP_EN, MAG_ODR_
 **Data Retrieval:**
 - `LIS3MDL_getTemperature_C(...)`: Returns temperature in degrees Celsius. 
 
-- `LIS3MDL_getMAG_X(...)`: Returns a 16-bit signed value representing the magnetic field along the X-axis.
+- `LIS3MDL_getMAG_X(...)`: Returns magnetic field along the X-axis in Gauss.
 
-- `LIS3MDL_getMAG_Y(...)`: Returns a 16-bit signed value representing the magnetic field along the Y-axis.
+- `LIS3MDL_getMAG_Y(...)`: Returns magnetic field along the Y-axis in Gauss
 
-- `LIS3MDL_getMAG_Z(...)`: Returns a 16-bit signed value representing the magnetic field along the Z-axis.
+- `LIS3MDL_getMAG_Z(...)`: Returns magnetic field along the Z-axis in Gauss
 
 - `LIS3MDL_XYZ_DRDY(...)`: Returns 1 if new data is available for X, Y, and Z axis.
 
