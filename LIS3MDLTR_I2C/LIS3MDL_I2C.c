@@ -8,6 +8,12 @@
 #include "LIS3MDL_I2C.h"
 
 
+
+/*- Private Variables -*/
+static float magSensitivity = 6842.0f; /* Default Sensitivity: 6842 LSB/Gauss | for ±4 Gauss */
+
+
+
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	LIS3MDL_DefaultInit
  * Description	:	Initialize LISM3MDL in pre-defined configuration
@@ -26,6 +32,9 @@
  * ------------------------------------------------------------------------------------------------------ */
 void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
 {
+	/*- Reset LIS3MDL -*/
+	LIS3MDL_DeInit(pI2CHandle);
+
 	uint8_t data = 0;
 	/*- Register 1: default value 0b00010000 -*/
 	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, CTRL_REG_1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
@@ -87,6 +96,9 @@ void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
 	/*- Configuring Register 5 with above settings -*/
 	HAL_I2C_Mem_Write(pI2CHandle, MAG_ADDRESS, CTRL_REG_5, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 
+	/*- Default Sensitivity -*/
+	magSensitivity = 6842.0f;
+
 }
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	LIS3MDL_UserInit
@@ -100,8 +112,11 @@ void LIS3MDL_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
  * Return Type	:	none (void)
  * Note		: Possible arguments: MAG_TEMP_x, MAG_ODR_x, MAG_OM_x, MAG_FS_x, MAG_M_x
  * ------------------------------------------------------------------------------------------------------ */
-void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t odr, int8_t xyzOM, int8_t FScale, int8_t measurementMode)
+void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_Enable, int8_t ODR, int8_t xyzOM, int8_t FScale, int8_t measurementMode)
 {
+	/*- Reset LIS3MDL -*/
+	LIS3MDL_DeInit(pI2CHandle);
+
 	/*- temporary variables to store registers contents  -*/
 	uint8_t reg1Config = 0;
 	uint8_t reg2Config = 0;
@@ -122,43 +137,43 @@ void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t
 	reg5Config &= (uint8_t)~(0xFF);
 
 	/*- Temperature sensor Configuration  -*/
-	if (temp_EnorDi)
+	if (temp_Enable)
 	{
 		/*- Enable temperature sensor, setting bit[7]  -*/
 		reg1Config |= (1<<7);
 	}
 
 	/*- ODR Configuration  -*/
-	if (odr == MAG_ODR_0_625HZ)
+	if (ODR == MAG_ODR_0_625HZ)
 	{
 		reg1Config &= ~(7<<2);
 	}
-	else if (odr == MAG_ODR_1_25HZ)
+	else if (ODR == MAG_ODR_1_25HZ)
 	{
 		reg1Config &= ~(7<<2);
 		reg1Config |= (1<<2);
 	}
-	else if (odr == MAG_ODR_2_5HZ)
+	else if (ODR == MAG_ODR_2_5HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (1<<3);
 	}
-	else if (odr == MAG_ODR_5HZ)
+	else if (ODR == MAG_ODR_5HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (3<<2);
 	}
-	else if (odr == MAG_ODR_10HZ)
+	else if (ODR == MAG_ODR_10HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (1<<4);
 	}
-	else if (odr == MAG_ODR_20HZ)
+	else if (ODR == MAG_ODR_20HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (5<<2);
 	}
-	else if (odr == MAG_ODR_40HZ)
+	else if (ODR == MAG_ODR_40HZ)
 	{
 		reg1Config &= ~(7<<2);
 	    reg1Config |= (3<<3);
@@ -210,21 +225,33 @@ void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t
 	if (FScale == MAG_FS_4G)
 	{
 		reg2Config &= ~(3<<5);
+
+		/*- Sensitivity -*/
+		magSensitivity = 6842.0f;
 	}
 	else if (FScale == MAG_FS_8G)
 	{
 		reg2Config &= ~(3<<5);
 		reg2Config |= (1<<5);
+
+		/*- Sensitivity -*/
+		magSensitivity = 3421.0f;
 	}
 	else if (FScale == MAG_FS_12G)
 	{
 		reg2Config &= ~(3<<5);
 		reg2Config |= (1<<6);
+
+		/*- Sensitivity -*/
+		magSensitivity = 2281.0f;
 	}
 	else
 	{
 		/*- FS: ±16 Gauss -*/
 		reg2Config |= (3<<5);
+
+		/*- Sensitivity -*/
+		magSensitivity = 1711.0f;
 	}
 
 	/*- Measurement Mode Configuration  -*/
@@ -255,7 +282,7 @@ void LIS3MDL_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t temp_EnorDi, int8_t
 
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	LIS3MDL_DeInit
- * Description	:	De-initialize LISM3MDL with user defined configuration
+ * Description	:	De-initialize/ Reset LISM3MDL
  * Parameter 1	:	Pointer to I2C Handle
  * Return Type	:	none (void)
  * Note		:	Reset all the Control Register to their default state
@@ -273,59 +300,59 @@ void LIS3MDL_DeInit(I2C_HandleTypeDef *pI2CHandle)
 
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	LIS3MDL_getMAG_X
- * Description	:	Returns magnetic field data in X axis
+ * Description	:	Returns magnetic field data in X axis in Gauss
  * Parameter 1	:	Pointer to I2C Handle
- * Return Type	:	int16_t (16 bit signed value)
+ * Return Type	:	float
  * Note		:
  * ------------------------------------------------------------------------------------------------------ */
-int16_t LIS3MDL_getMAG_X(I2C_HandleTypeDef *pI2CHandle)
+float LIS3MDL_getMAG_X(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_L = 0;
-	uint8_t Out_H = 0;
-	/*- Read register OUT_X_L -*/
-	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_X_L, I2C_MEMADD_SIZE_8BIT, &Out_L, 1, HAL_MAX_DELAY);
-	/*- Read register OUT_X_H -*/
-	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_X_H, I2C_MEMADD_SIZE_8BIT, &Out_H, 1, HAL_MAX_DELAY);
 
-	return ((int16_t)(Out_H << 8) | Out_L);
+	uint16_t magX = 0;
+	uint8_t data[2];
+	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_X_L, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	magX = (int16_t)(data[1] << 8) | (data[0]);
+
+	return ((float)magX / magSensitivity);
+
 }
 
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	LIS3MDL_getMAG_Y
- * Description	:	Returns magnetic field data in Y axis
+ * Description	:	Returns magnetic field data in Y axis in Gauss
  * Parameter 1	:	Pointer to I2C Handle
- * Return Type	:	int16_t (16 bit signed value)
+ * Return Type	:	float
  * Note		:
  * ------------------------------------------------------------------------------------------------------ */
-int16_t LIS3MDL_getMAG_Y(I2C_HandleTypeDef *pI2CHandle)
+float LIS3MDL_getMAG_Y(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_L = 0;
-	uint8_t Out_H = 0;
-	/*- Read register OUT_Y_L -*/
-	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_Y_L, I2C_MEMADD_SIZE_8BIT, &Out_L, 1, HAL_MAX_DELAY);
-	/*- Read register OUT_Y_H -*/
-	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_Y_H, I2C_MEMADD_SIZE_8BIT, &Out_H, 1, HAL_MAX_DELAY);
 
-	return ((int16_t)(Out_H << 8) | Out_L);
+	uint16_t magY = 0;
+	uint8_t data[2];
+	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_Y_L, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	magY = (int16_t)(data[1] << 8) | (data[0]);
+
+	return ((float)magY / magSensitivity);
+
 }
 
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	LIS3MDL_getMAG_Z
- * Description	:	Returns magnetic field data in Z axis
+ * Description	:	Returns magnetic field data in Z axis in Gauss
  * Parameter 1	:	Pointer to I2C Handle
- * Return Type	:	int16_t (16 bit signed value)
+ * Return Type	:	float
  * Note		:
  * ------------------------------------------------------------------------------------------------------ */
-int16_t LIS3MDL_getMAG_Z(I2C_HandleTypeDef *pI2CHandle)
+float LIS3MDL_getMAG_Z(I2C_HandleTypeDef *pI2CHandle)
 {
-	uint8_t Out_L = 0;
-	uint8_t Out_H = 0;
-	/*- Read register OUT_Z_L -*/
-	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_Z_L, I2C_MEMADD_SIZE_8BIT, &Out_L, 1, HAL_MAX_DELAY);
-	/*- Read register OUT_Z_H -*/
-	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_Z_H, I2C_MEMADD_SIZE_8BIT, &Out_H, 1, HAL_MAX_DELAY);
 
-	return ((int16_t)(Out_H << 8) | Out_L);
+	uint16_t magZ = 0;
+	uint8_t data[2];
+	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_Z_L, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
+	magZ = (int16_t)(data[1] << 8) | (data[0]);
+
+	return ((float)magZ / magSensitivity);
+
 }
 
 /* ------------------------------------------------------------------------------------------------------
@@ -339,13 +366,15 @@ float LIS3MDL_getTemperature_C(I2C_HandleTypeDef *pI2CHandle)
 {
 	uint8_t Out_L = 0;
 	uint8_t Out_H = 0;
+	int16_t tempRaw = 0;
 	/*- Read register OUT_Y_L -*/
 	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, TEMP_OUT_L, I2C_MEMADD_SIZE_8BIT, &Out_L, 1, HAL_MAX_DELAY);
 	/*- Read register OUT_Y_H -*/
 	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, TEMP_OUT_H, I2C_MEMADD_SIZE_8BIT, &Out_H, 1, HAL_MAX_DELAY);
 
 	// configure offset and scaling and return
-	return (((int16_t)(Out_H << 8) | Out_L) / 256.0f) + 25;
+	tempRaw =  ((int16_t)(Out_H << 8) | Out_L);
+	return ((float)tempRaw / 256.0f) + 25;
 
 }
 
