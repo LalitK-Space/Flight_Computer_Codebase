@@ -308,7 +308,7 @@ void LIS3MDL_DeInit(I2C_HandleTypeDef *pI2CHandle)
 float LIS3MDL_getMAG_X(I2C_HandleTypeDef *pI2CHandle)
 {
 
-	uint16_t magX = 0;
+	int16_t magX = 0;
 	uint8_t data[2];
 	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_X_L, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
 	magX = (int16_t)(data[1] << 8) | (data[0]);
@@ -327,7 +327,7 @@ float LIS3MDL_getMAG_X(I2C_HandleTypeDef *pI2CHandle)
 float LIS3MDL_getMAG_Y(I2C_HandleTypeDef *pI2CHandle)
 {
 
-	uint16_t magY = 0;
+	int16_t magY = 0;
 	uint8_t data[2];
 	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_Y_L, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
 	magY = (int16_t)(data[1] << 8) | (data[0]);
@@ -346,7 +346,7 @@ float LIS3MDL_getMAG_Y(I2C_HandleTypeDef *pI2CHandle)
 float LIS3MDL_getMAG_Z(I2C_HandleTypeDef *pI2CHandle)
 {
 
-	uint16_t magZ = 0;
+	int16_t magZ = 0;
 	uint8_t data[2];
 	HAL_I2C_Mem_Read(pI2CHandle, MAG_ADDRESS, OUT_Z_L, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
 	magZ = (int16_t)(data[1] << 8) | (data[0]);
