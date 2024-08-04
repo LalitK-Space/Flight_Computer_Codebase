@@ -10,9 +10,6 @@
 
 /*- Helper Function:  -*/
 static uint16_t map_OffcountToAngle(uint16_t OFFcount, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max);
-
-
-
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	PCA_Init
  * Description	:	Initialize PCA9685 with user defined PWM frequency
@@ -47,8 +44,8 @@ void PCA_Init(I2C_HandleTypeDef *pI2CHandle, uint16_t pwmFrequency)
 
 	/*- Write Pre-scaler value -*/
 	HAL_I2C_Mem_Write(pI2CHandle, PCA9685_ADDRESS, PCA_PRE_SCALE, I2C_MEMADD_SIZE_8BIT, &preScaler, 1, HAL_MAX_DELAY);
-	/*- wait for oscillator to stabilize (500us) -*/
-	HAL_Delay(5);	// Extra, just to be sure
+	/*- wait for oscillator to stabilize (500us), used 1ms -*/
+	HAL_Delay(1);
 
 	/*- Enable Normal Mode -*/
 	data = 0;
@@ -91,9 +88,32 @@ void PCA_sleep(I2C_HandleTypeDef *pI2CHandle)
 	/*- Set: Sleep Bit -*/
 	data |= (1<<4);
 	HAL_I2C_Mem_Write(pI2CHandle, PCA9685_ADDRESS, PCA_MODE1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
-	/*- wait for oscillator to stabilize (500us) -*/
-	HAL_Delay(5);
+	/*- wait for oscillator to stabilize (500us), using 1ms -*/
+	HAL_Delay(1);
 }
+
+
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	PCA_wakeUp
+ * Description	:	Wake up from sleep
+ * Parameter 1	:	Pointer to I2C Handle
+ * Return Type	:	none (void)
+ * Note		:
+ * ------------------------------------------------------------------------------------------------------ */
+void PCA_wakeUp(I2C_HandleTypeDef *pI2CHandle)
+{
+
+    uint8_t data = 0;
+    HAL_I2C_Mem_Read(pI2CHandle, PCA9685_ADDRESS, PCA_MODE1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+    /*- Clear: Sleep Bit -*/
+    data &= ~(1<<4);
+    HAL_I2C_Mem_Write(pI2CHandle, PCA9685_ADDRESS, PCA_MODE1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+    /*- Wait for oscillator to stabilize (500us), using 1ms -*/
+    HAL_Delay(1);
+
+}
+
 
 
 /* ------------------------------------------------------------------------------------------------------
@@ -178,7 +198,7 @@ void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angl
  * Parameter 3	:	Maximum value of OFFcount to put servo at angle 180 degrees [SERVO_MAX]
  * Return Type	:	PWM pulse count (OFFcount) (void)
  * Note		:
- * 			-	similar to map() Arduino's function
+ * 			-	similar to Arduino's map() function
  * ------------------------------------------------------------------------------------------------------ */
 static uint16_t map_OffcountToAngle(uint16_t OFFcount, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max)
 
