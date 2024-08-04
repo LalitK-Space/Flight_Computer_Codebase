@@ -66,6 +66,7 @@ void PCA_Init(I2C_HandleTypeDef *pI2CHandle, uint16_t pwmFrequency);
 
 // Control
 void PCA_sleep(I2C_HandleTypeDef *pI2CHandle);
+void PCA_wakeUp(I2C_HandleTypeDef *pI2CHandle);
 void PCA_setPWM(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint16_t ONcount, uint16_t OFFcount);
 void PCA_setPWMtoAll(I2C_HandleTypeDef *pI2CHandle, uint16_t ONcount, uint16_t OFFcount);
 void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angle);
