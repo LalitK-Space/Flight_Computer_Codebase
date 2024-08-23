@@ -60,10 +60,10 @@ Note:
 - But, to get a more precise reading, pressure at sea level can be calculated using measured pressure and the known altitude values.
 ```c
 /* Calculating pressure at sea level */
-float pressure_hPa  = BMP_getPressure_Pa() / 100; /* /100: Pa to hPa */
-float knownAltitude_m = x.x;                        /* Known elevation in m */
+float pressure_hPa  = BMP_getPressure_Pa() / 100;   /* /100: Pa to hPa */
+float knownAltitude_m = 0.0;                        /* Known elevation in m */
 
-float pressure_seaLevel_hPa = pressure_hPa / pow((1.0 - (knownAltitude/44330.0)), 5.255);
+float pressure_seaLevel_hPa = pressure_hPa / pow((1.0 - (knownAltitude_m/44330.0)), 5.255);
 
 /* Calculate it once and use the value in BMP_getAltitude_m() as the second expected argument to get more precise altitude readings. */
 /* The equation is from BMP180 Datasheet */
