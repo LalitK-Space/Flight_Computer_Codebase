@@ -9,7 +9,9 @@
 
 
 /*- Helper Function:  -*/
-static uint16_t map_OffcountToAngle(uint16_t OFFcount, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max);
+static uint16_t map_AngletToPWM(uint8_t angle, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max);
+
+
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	PCA_Init
  * Description	:	Initialize PCA9685 with user defined PWM frequency
@@ -191,7 +193,7 @@ void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angl
 /* ------------------------------------------------------------------------------------------------------
  * Name		:	map_OffcountToAngle
  * Description	:	Static function to map PWM pulse width (OFFcount) to servo angle
- * Parameter 1	:	OFF Time/Count [0-4096]
+ * Parameter 1	:	Angle [between SERVO_ANGLE_MIN and SERVO_ANGLE_MAX]
  * Parameter 2	:	Minimum Servo Angle [SERVO_ANGLE_MIN]
  * Parameter 3	:	Maximum Servo Angle [SERVO_ANGLE_MAX]
  * Parameter 2	:	Minimum value of OFFcount to put servo at angle 0 degrees [SERVO_MIN]
@@ -200,20 +202,19 @@ void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angl
  * Note		:
  * 			-	similar to Arduino's map() function
  * ------------------------------------------------------------------------------------------------------ */
-static uint16_t map_OffcountToAngle(uint16_t OFFcount, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max)
-
+static uint16_t map_AngletToPWM(uint8_t angle, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max)
 {
 	/*- Ensuring values within range -*/
-    if (OFFcount < servoAngle_min)
+    if (angle < servoAngle_min)
     {
-        OFFcount = servoAngle_min;
+        angle = servoAngle_min;
     }
-    else if (OFFcount > servoAngle_max)
+    else if (angle > servoAngle_max)
     {
-        OFFcount = servoAngle_max;
+        angle = servoAngle_max;
     }
 
 	/*- Scaling -*/
-    return (uint16_t) (OFFcount - servoAngle_min) * (servo_max - servo_min) / (servoAngle_max - servoAngle_min) + servo_min;
+    return (uint16_t) (angle - servoAngle_min) * (servo_max - servo_min) / (servoAngle_max - servoAngle_min) + servo_min;
 
 }
