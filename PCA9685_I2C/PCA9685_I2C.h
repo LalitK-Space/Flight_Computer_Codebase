@@ -21,9 +21,9 @@
 #define PCA_PRESCALE_MAX	(255)
 
 /* Servo Control */
-/*- Calculate SERVO_MIN and SERVO_MAX for your servos [Range: [0-4096] ON and OFF Time/Count/Length] -*/
-#define SERVO_MAX	        (475)	/*- Set carefully | puts servo at 180 Degrees -*/
-#define SERVO_MIN	        (75)	/*- Set carefully | puts servo at 0 degrees -*/
+/*- Calculate SERVO_MIN and SERVO_MAX for your servos, refer to README for calculations -*/
+#define SERVO_MAX	        (491)	/*- Set carefully | puts servo at 180 Degrees -*/
+#define SERVO_MIN	        (82)	/*- Set carefully | puts servo at 0 degrees -*/
 #define SERVO_ANGLE_MIN	        (0)
 #define SERVO_ANGLE_MAX	        (180)
 
