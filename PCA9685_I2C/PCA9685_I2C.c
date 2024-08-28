@@ -71,7 +71,6 @@ void PCA_Init(I2C_HandleTypeDef *pI2CHandle, uint16_t pwmFrequency)
 	HAL_I2C_Mem_Read(pI2CHandle, PCA9685_ADDRESS, PCA_MODE2, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	data |= (1<<2);
 	HAL_I2C_Mem_Write(pI2CHandle, PCA9685_ADDRESS, PCA_MODE2, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
-
 }
 
 
@@ -105,7 +104,6 @@ void PCA_sleep(I2C_HandleTypeDef *pI2CHandle)
  * ------------------------------------------------------------------------------------------------------ */
 void PCA_wakeUp(I2C_HandleTypeDef *pI2CHandle)
 {
-
     uint8_t data = 0;
     HAL_I2C_Mem_Read(pI2CHandle, PCA9685_ADDRESS, PCA_MODE1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
     /*- Clear: Sleep Bit -*/
@@ -113,7 +111,6 @@ void PCA_wakeUp(I2C_HandleTypeDef *pI2CHandle)
     HAL_I2C_Mem_Write(pI2CHandle, PCA9685_ADDRESS, PCA_MODE1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
     /*- Wait for oscillator to stabilize (500us), using 1ms -*/
     HAL_Delay(1);
-
 }
 
 
@@ -183,10 +180,9 @@ void PCA_setPWMtoAll(I2C_HandleTypeDef *pI2CHandle, uint16_t ONcount, uint16_t O
 void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angle)
 {
 	/*- Calculate PWM OFFcount based on angle -*/
-	uint16_t pwmOffcount = map_OffcountToAngle(angle, SERVO_ANGLE_MIN, SERVO_ANGLE_MAX, SERVO_MIN, SERVO_MAX);
+	uint16_t pwmOffcount = map_AngletToPWM(angle, SERVO_ANGLE_MIN, SERVO_ANGLE_MAX, SERVO_MIN, SERVO_MAX);
 
 	PCA_setPWM(pI2CHandle, port, 0, pwmOffcount);
-
 }
 
 
@@ -216,5 +212,4 @@ static uint16_t map_AngletToPWM(uint8_t angle, uint8_t servoAngle_min, uint8_t s
 
 	/*- Scaling -*/
     return (uint16_t) (angle - servoAngle_min) * (servo_max - servo_min) / (servoAngle_max - servoAngle_min) + servo_min;
-
 }
