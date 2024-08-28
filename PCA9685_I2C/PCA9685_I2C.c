@@ -9,7 +9,7 @@
 
 
 /*- Helper Function:  -*/
-static uint16_t map_AngletToPWM(uint8_t angle, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max);
+static uint16_t map_AngleToPWM(uint8_t angle, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max);
 
 
 /* ------------------------------------------------------------------------------------------------------
@@ -180,14 +180,14 @@ void PCA_setPWMtoAll(I2C_HandleTypeDef *pI2CHandle, uint16_t ONcount, uint16_t O
 void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angle)
 {
 	/*- Calculate PWM OFFcount based on angle -*/
-	uint16_t pwmOffcount = map_AngletToPWM(angle, SERVO_ANGLE_MIN, SERVO_ANGLE_MAX, SERVO_MIN, SERVO_MAX);
+	uint16_t pwmOffcount = map_AngleToPWM(angle, SERVO_ANGLE_MIN, SERVO_ANGLE_MAX, SERVO_MIN, SERVO_MAX);
 
 	PCA_setPWM(pI2CHandle, port, 0, pwmOffcount);
 }
 
 
 /* ------------------------------------------------------------------------------------------------------
- * Name		:	map_OffcountToAngle
+ * Name		:	map_AngleToPWM
  * Description	:	Static function to map PWM pulse width (OFFcount) to servo angle
  * Parameter 1	:	Angle [between SERVO_ANGLE_MIN and SERVO_ANGLE_MAX]
  * Parameter 2	:	Minimum Servo Angle [SERVO_ANGLE_MIN]
@@ -198,7 +198,7 @@ void PCA_setServoAngle(I2C_HandleTypeDef *pI2CHandle, uint8_t port, uint8_t angl
  * Note		:
  * 			-	similar to Arduino's map() function
  * ------------------------------------------------------------------------------------------------------ */
-static uint16_t map_AngletToPWM(uint8_t angle, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max)
+static uint16_t map_AngleToPWM(uint8_t angle, uint8_t servoAngle_min, uint8_t servoAngle_max, uint16_t servo_min, uint16_t servo_max)
 {
 	/*- Ensuring values within range -*/
     if (angle < servoAngle_min)
