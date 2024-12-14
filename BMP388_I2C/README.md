@@ -28,10 +28,11 @@
 - Over-sampling for temperature measurement is x1 (No over-sampling)
 - ODR is 200Hz, Pre-scaler is 1 and Sampling Period is 5ms
 - IIR Filter is in Bypass mode (no filtering)
+- Temperature/Pressure data ready interrupt for INT pin and INT_STATUS is enabled
 
 *BMP_UserInit(...)* 
 <p>This function initializes the pressure sensor with the user-defined configurations.
-Pressure and Temperature sensors are enabled and users can configure the following:
+Pressure and Temperature sensors are enabled, and Temperature/Pressure data ready interrupt for INT pin and INT_STATUS is enabled, and users can configure the following:
 
 - Over-sampling setting for pressure measurement
 - Over-sampling setting for temperature measurement
@@ -53,7 +54,8 @@ NOTE:
 **Data Retrieval:**
 - `BMP_getTemperature_C(...)`: Returns temperature in degrees Celsius. 
 - `BMP_getPressure_Pa(...)`: Returns pressure in Pascal (Pa). 
-- `BMP_getAltitude_m(...)`: Returns altitude in meters (m)
+- `BMP_getAltitude_m(...)`: Returns altitude in meters (m).
+- `BMP_INT_STATUS_drdy(...)`: Returns data ready interrupt status  (1 if data ready, 0 otherwise).
 
 Note:
 -  Function BMP_getAltitude_m() expects the user to provide pressure at sea level in hPa. According to Wikipedia, the standard atmosphere is a unit of pressure defined as 101325 Pa (1013.25 hPa). 1013.25 can be provided as an expected argument to the function. 
