@@ -11,6 +11,7 @@
 static void get_compensationCoeff(I2C_HandleTypeDef *pI2CHandle, compensationCoeff_t *pcompensationCoeff);
 static int64_t compensateTemperature(int32_t rawTemp, compensationCoeff_t *pcompensationCoeff);
 static uint64_t compensatePressure(int32_t rawPress, compensationCoeff_t *pcompensationCoeff);
+static void enable_drdy(I2C_HandleTypeDef *pI2CHandle);
 
 compensationCoeff_t compCoeff;
 
@@ -25,6 +26,7 @@ compensationCoeff_t compCoeff;
  * 				- Over-sampling for temperature measurement is x1 (No over-sampling)
  * 				- ODR = 200Hz | Pre-scaler = 1 | Sampling Period = 5ms
  * 				- IIR Filter is in Bypass mode (no filtering)
+ * 				- Temperature/Pressure data ready interrupt for INT pin and INT_STATUS is enabled
  * ------------------------------------------------------------------------------------------------------ */
 void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
 {
@@ -58,6 +60,9 @@ void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
 	 *  	- Bypass mode (no filtering)
 	 *  -*/
 
+	/* Enable Data Ready  interrupt */
+	enable_drdy(pI2CHandle);
+
 }
 
 
@@ -73,6 +78,7 @@ void BMP_DefaultInit(I2C_HandleTypeDef *pI2CHandle)
  * Note		:
  * 			- Please follow recommended values to get proper and valid readings.
  * 			- Pressure and Temperature sensor is enabled.
+ * 			- Temperature/Pressure data ready interrupt for INT pin and INT_STATUS is enabled
  * 			- Possible arguments: OSR_P_x, OSR_T_x, ODR_x, IIR_COEFF_x
  * ------------------------------------------------------------------------------------------------------ */
 void BMP_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t osr_p, uint8_t osr_t, uint8_t odr, uint8_t iir_coeff)
@@ -119,6 +125,9 @@ void BMP_UserInit(I2C_HandleTypeDef *pI2CHandle, uint8_t osr_p, uint8_t osr_t, u
 	data &= ~(7<<1);			// Bits[7:4] and bit[1] are Reserved
 	data |= (iir_coeff << 1);	// Configure Filter Coefficient
 	HAL_I2C_Mem_Write(pI2CHandle,BMP388_ADDRESS, CONFIG, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
+
+	/* Enable Data Ready  interrupt */
+	enable_drdy(pI2CHandle);
 
 }
 
@@ -370,5 +379,45 @@ static uint64_t compensatePressure(int32_t rawPress, compensationCoeff_t *pcompe
 	compensatedPress = (((uint64_t)partial_data4 * 25) / (uint64_t)1099511627776);
 
 	return compensatedPress;
+
+}
+
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	enable_drdy
+ * Description	:	Static function to enable temperature/pressure data ready interrupt for INT pin and INT_STATUS
+ * Parameter 1	:	Pointer to I2C Handle
+ * Return Type	:	none (void)
+ * Note		:	Interrupt configuration just for drdy_en bit (Bit[6] of INT_CTRL)
+ *
+ * ------------------------------------------------------------------------------------------------------ */
+static void enable_drdy(I2C_HandleTypeDef *pI2CHandle)
+{
+
+	  uint8_t data = 0;
+	  /* Read INT_CTRL Register */
+	  HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, INT_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	  /* Enable drdy_en, set bit[6] */
+	  data |= (1<<6);
+	  HAL_I2C_Mem_Write(pI2CHandle, BMP388_ADDRESS, INT_CTRL, I2C_MEMADD_SIZE_8BIT, &data , 1, HAL_MAX_DELAY);
+
+}
+
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	BMP_INT_STATUS_drdy
+ * Description	:	Reads the INT_STATUS register and returns the drdy bit status.
+ * Parameter 1	:	Pointer to I2C Handle
+ * Return Type	:	uint8_t, drdy bit status  (1 if data ready, 0 otherwise)
+ * Note		:	Status is cleared after reading
+ *
+ * ------------------------------------------------------------------------------------------------------ */
+uint8_t BMP_INT_STATUS_drdy(I2C_HandleTypeDef *pI2CHandle)
+{
+	  uint8_t data = 0;
+	  /* Read INT_STATUS */
+	  HAL_I2C_Mem_Read(pI2CHandle, BMP388_ADDRESS, INT_STATUS, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	  /* Extract DRDY bit[3] and return */
+	  return (data >> 3) & 0x01;
 
 }
