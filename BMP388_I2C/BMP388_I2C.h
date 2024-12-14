@@ -147,5 +147,7 @@ void BMP_DeInit(I2C_HandleTypeDef *pI2CHandle);
 float BMP_getTemperature_C(I2C_HandleTypeDef *pI2CHandle);
 float BMP_getPressure_Pa(I2C_HandleTypeDef *pI2CHandle);
 float BMP_getAltitude_m(I2C_HandleTypeDef *pI2CHandle, float seaLevel_hPa);
+// Get Status of Data Ready bit
+uint8_t BMP_INT_STATUS_drdy(I2C_HandleTypeDef *pI2CHandle);
 
 #endif /* INC_BMP388_I2C_H_ */
