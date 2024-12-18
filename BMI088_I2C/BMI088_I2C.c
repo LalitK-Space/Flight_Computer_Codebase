@@ -472,3 +472,151 @@ float BMI_getTemperature_C(I2C_HandleTypeDef *pI2CHandle)
 
 	return ((float)Temp_int11 * 0.125f + 23.0f);
 }
+
+
+
+
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	BMI_getAcc_DrdyStatus
+ * Description	:	Reads the ACC_INT_STAT_1 register and returns the acc_drdy bit status.
+ * Parameter 1	:	Pointer to I2C Handle
+ * Return Type	:	uint8_t, drdy bit status  (1 if data ready, 0 otherwise)
+ * Note		:	Status is cleared after reading
+ *
+ * ------------------------------------------------------------------------------------------------------ */
+uint8_t BMI_getAcc_DrdyStatus(I2C_HandleTypeDef *pI2CHandle)
+{
+	  uint8_t data = 0;
+	  /* Read ACC_INT_STAT_1 */
+	  HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, ACC_INT_STAT_1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	  /* Extract DRDY bit[7] and return */
+	  return (data >> 7) & 0x01;
+}
+
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	BMI_getGyro_DrdyStatus
+ * Description	:	Reads the GYRO_INT_STAT_1 register and returns the gyro_drdy bit status.
+ * Parameter 1	:	Pointer to I2C Handle
+ * Return Type	:	uint8_t, drdy bit status  (1 if data ready, 0 otherwise)
+ * Note		:	Status is cleared after reading
+ *
+ * ------------------------------------------------------------------------------------------------------ */
+uint8_t BMI_getGyro_DrdyStatus(I2C_HandleTypeDef *pI2CHandle)
+{
+	  uint8_t data = 0;
+	  /* Read GYRO_INT_STAT_1 */
+	  HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, GYRO_INT_STAT_1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	  /* Extract DRDY bit[7] and return */
+	  return (data >> 7) & 0x01;
+}
+
+
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	BMI_ACC_enable_INTx
+ * Description	:	Enables the Accelerometer interrupt and map the data ready interrupt to selected pin
+ * Parameter 1	:	Pointer to I2C Handle
+ * Parameter 2	:	INTx pin, INT1 or INT2 for accelerometer
+ * Return Type	:	none (void)
+ * Note		:	- Possible argument: ACC_INT1_OUT, ACC_INT2_OUT
+ * 				- INTx pin behavior is configured to Push-Pull
+ * 				- INTx pin active state is configured to Active High
+ * 				- Data Ready interrupt is mapped to ACC_INTx_OUT
+ * ------------------------------------------------------------------------------------------------------ */
+void BMI_ACC_enable_INTx(I2C_HandleTypeDef *pI2CHandle, uint8_t ACC_INTx_OUT)
+{
+	  uint8_t data = 0;
+
+	  if (ACC_INTx_OUT == ACC_INT1_OUT)
+	  {
+		  data = 0;
+		  HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, INT1_IO_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		  /* Enable INT1 as output, Bit[3]*/
+		  data |= (1<<3);
+		  /* Pin Behavior - Push Pull (default) */
+		  /* Active State - Active High, Bit[1] */
+		  data |= (1<<1);
+		  /* Configure INT1_IO_CONF with above settings */
+		  HAL_I2C_Mem_Write(pI2CHandle, ACC_ADDRESS, INT1_IO_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+
+		  /* Map data ready interrupt to pin INT1 */
+		  data = 0;
+		  HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, INT_MAP_DATA, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		  /* Map data ready interrupt, Bit[2] */
+		  data |= (1<<2);
+		  HAL_I2C_Mem_Write(pI2CHandle, ACC_ADDRESS, INT_MAP_DATA, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+
+	  }
+	  else	/* Map to INT2 as default */
+	  {
+		  data = 0;
+		  HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, INT2_IO_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		  /* Enable INT2 as output, Bit[3]*/
+		  data |= (1<<3);
+		  /* Pin Behavior - Push Pull (default) */
+		  /* Active State - Active High, Bit[1] */
+		  data |= (1<<1);
+		  /* Configure INT2_IO_CONF with above settings */
+		  HAL_I2C_Mem_Write(pI2CHandle, ACC_ADDRESS, INT2_IO_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+
+		  /* Map data ready interrupt to pin INT2 */
+		  data = 0;
+		  HAL_I2C_Mem_Read(pI2CHandle, ACC_ADDRESS, INT_MAP_DATA, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		  /* Map data ready interrupt, Bit[6] */
+		  data |= (1<<6);
+		  HAL_I2C_Mem_Write(pI2CHandle, ACC_ADDRESS, INT_MAP_DATA, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	  }
+
+
+}
+
+
+
+/* ------------------------------------------------------------------------------------------------------
+ * Name		:	BMI_GYRO_enable_INTx
+ * Description	:	Enables the Gyroscope interrupt and map the data ready interrupt to selected pin
+ * Parameter 1	:	Pointer to I2C Handle
+ * Parameter 2	:	INTx pin, INT3 or INT4 for gyroscope
+ * Return Type	:	none (void)
+ * Note		:	- Possible argument: GYRO_INT3_OUT, GYRO_INT4_OUT
+ * 				- INTx pin behavior is configured to Push-Pull
+ * 				- INTx pin active state is configured to Active High
+ * 				- Data Ready interrupt is mapped to GYRO_INTx_OUT
+ * ------------------------------------------------------------------------------------------------------ */
+void BMI_GYRO_enable_INTx(I2C_HandleTypeDef *pI2CHandle, uint8_t GYRO_INTx_OUT)
+{
+	  uint8_t data = 0;
+	  /* GYRO_INT_CTRL, Enable new data interrupt to be triggered */
+	  data |= 0x80;
+	  HAL_I2C_Mem_Write(pI2CHandle, GYRO_ADDRESS, GYRO_INT_CTRL, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+
+	  if (GYRO_INTx_OUT == GYRO_INT3_OUT)
+	  {
+		  data = 0;
+		  HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, GYRO_INT3_INT4_IO_CONF, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		  /* Pin Behavior - Push Pull (default) */
+		  /* Active State - Active High, Bit[0] */
+		  data |= (1<<0);
+		  HAL_I2C_Mem_Write(pI2CHandle, GYRO_ADDRESS, GYRO_INT3_INT4_IO_CONF, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		  /* Map data ready interrupt to pin INT3 */
+		  data = 0;
+		  data |= 0x01;
+		  HAL_I2C_Mem_Write(pI2CHandle, GYRO_ADDRESS, 0x18, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+
+	  }
+	  else	/* Map to INT4 as default */
+	  {
+		  data = 0;
+		  HAL_I2C_Mem_Read(pI2CHandle, GYRO_ADDRESS, GYRO_INT3_INT4_IO_CONF, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		  /* Pin Behavior - Push Pull (default) */
+		  /* Active State - Active High, Bit[2] */
+		  data |= (1<<2);
+		  HAL_I2C_Mem_Write(pI2CHandle, GYRO_ADDRESS, GYRO_INT3_INT4_IO_CONF, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		  /* Map data ready interrupt to pin INT4 */
+		  data = 0;
+		  data |= 0x80;
+		  HAL_I2C_Mem_Write(pI2CHandle, GYRO_ADDRESS, 0x18, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+	  }
+}
