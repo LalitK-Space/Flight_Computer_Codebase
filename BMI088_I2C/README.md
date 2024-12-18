@@ -82,5 +82,39 @@ NOTEL: This User Initialization *`BMI_Gyro_UserInit(&hi2cx, GYRO_ODR2000_BW532, 
 
 - `BMI_getGyro_Z(...)`: Returns angular velocity along Z-axis in degrees per second (°/s).
 
-# Currently in progress:
-**Interrupt mapping and configurations**
+- `BMI_getAcc_DrdyStatus(...)`: Returns the acc_drdy bit status (1 if data is ready, 0 otherwise).
+
+- `BMI_getGyro_DrdyStatus(...)`: Returns the gyro_drdy bit status (1 if data is ready, 0 otherwise).
+
+**Interrupt Configuration and Mapping**
+- `BMI_ACC_enable_INTx(...)`: Enables the Accelerometer interrupt and map the data ready interrupt to selected pin with the following configurations:
+    - INTx pin behavior is configured to Push-Pull
+    - INTx pin active state is configured to Active High
+- `BMI_GYRO_enable_INTx(...)`: Enables the Gyroscope interrupt and map the data ready interrupt to selected pin with the following configurations:
+    - INTx pin behavior is configured to Push-Pull
+    - INTx pin active state is configured to Active High
+
+**Example Usage - Interrupt Configuration and Data Ready Status**
+```c
+/* Initialize Accelerometer and Gyroscope */
+  BMI_Acc_DefaultInit(&hi2cx);
+  BMI_Gyro_DefaultInit(&hi2cx);
+
+/* Interrupt Configuration and Mapping */
+  BMI_ACC_enable_INTx(&hi2cx, ACC_INTx_OUT); /* INT1 and INT2 for accelerometer */
+  BMI_GYRO_enable_INTx(&hi2cx, GYRO_INTx_OUT); /* INT3 and INT4 for gyroscope */
+
+  /* In main loop or task */
+
+ /* Data Ready Status for accelerometer */
+ if (BMI_getAcc_DrdyStatus(&hi2cx))
+ {
+        /* Read accelerometer data */
+ }
+
+ /* Data Ready Status for gyroscope */
+ if (BMI_getGyro_DrdyStatus(&hi2cx))
+ {
+        /* Read gyroscope data */
+ }
+```
