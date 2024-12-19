@@ -126,6 +126,16 @@ while (1)
 ```
 
 *2. Using EXTI (External Interrupts) for Data Ready Detection*
+
+STEP 1: *INTx Pin Configuration and Mapping:* 
+> The desired interrupt pins (INTx) are already configured as OUTPUT pins with the pin behavior set to Active High when calling the following functions:
+- BMI_ACC_enable_INTx(&hi2cx, ACC_INTx_OUT)
+- BMI_GYRO_enable_INTx(&hi2cx, GYRO_INTx_OUT)
+
+STEP 2: *Setting Up EXTI Line on the MCU:*
+- Configure the GPIO pins of the MCU (connected to BMI088 INTx pins) as EXTI lines.
+- Enable interrupts for these pins in the NVIC.
+- Implement the EXTI callback function to handle the Data Ready Interrupts (DRDY) and process accelerometer or gyroscope data as needed. 
 ```c
 /* Example ISR (EXTI Callback) */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) 
