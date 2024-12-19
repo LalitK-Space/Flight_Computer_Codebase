@@ -95,6 +95,9 @@ NOTEL: This User Initialization *`BMI_Gyro_UserInit(&hi2cx, GYRO_ODR2000_BW532, 
     - INTx pin active state is configured to Active High
 
 **Example Usage - Interrupt Configuration and Data Ready Status**
+
+*1. Polling the Data Ready Status (DRDY) Bit: Interrupt pins are not connected to the MCU as EXTI*
+
 ```c
 /* Initialize Accelerometer and Gyroscope */
   BMI_Acc_DefaultInit(&hi2cx);
@@ -105,16 +108,37 @@ NOTEL: This User Initialization *`BMI_Gyro_UserInit(&hi2cx, GYRO_ODR2000_BW532, 
   BMI_GYRO_enable_INTx(&hi2cx, GYRO_INTx_OUT); /* INT3 and INT4 for gyroscope */
 
   /* In main loop or task */
+while (1)
+{
+  /* Data Ready Status for accelerometer */
+  if (BMI_getAcc_DrdyStatus(&hi2cx))
+  {
+    /* Read accelerometer data */
+  }
 
- /* Data Ready Status for accelerometer */
- if (BMI_getAcc_DrdyStatus(&hi2cx))
- {
-        /* Read accelerometer data */
- }
-
- /* Data Ready Status for gyroscope */
- if (BMI_getGyro_DrdyStatus(&hi2cx))
- {
-        /* Read gyroscope data */
- }
+  /* Data Ready Status for gyroscope */
+  if (BMI_getGyro_DrdyStatus(&hi2cx))
+  {
+    /* Read gyroscope data */
+  }  
+  
+}
 ```
+
+*2. Using EXTI (External Interrupts) for Data Ready Detection*
+```c
+/* Example ISR (EXTI Callback) */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) 
+{
+    if (GPIO_Pin == ACC_INTx_OUT_PIN) /* Check if accelerometer interrupt */
+    {  
+        /* Read accelerometer data */
+    } 
+    else if (GPIO_Pin == GYRO_INTx_OUT_PIN) /* Check if gyroscope interrupt */ 
+    {  
+        /* Read gyroscope data */
+    }
+}
+```
+
+
