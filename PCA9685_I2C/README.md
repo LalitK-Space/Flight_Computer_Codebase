@@ -43,30 +43,37 @@
 # Servo Control
 **Using PCA_setServoAngle() function**
 
-`This function uses values SERVO_MIN and SERVO_MAX to calculate the minimum and maximum PWM pulse length/count needed to put the servo at 0 and 180 degrees.` 
-- Given that these values can differ between servos, assigning them properly is essential. This ensures the servo operates within its safe range, avoiding any potential stress or damage.
+`This function calculates the correct PWM pulse width using SERVO_MIN and SERVO_MAX, ensuring the servo moves accurately between 0° and 180°.` 
+
+Since servo PWM timing varies across different models, properly configuring SERVO_MIN and SERVO_MAX is critical to prevent servo over-travel, excessive current draw, and unwanted mechanical stress.
 
 - To calculate the SERVO_MIN and SERVO_MAX for your servos, use `PCA_setPWM(&hi2cx, PCA_PORTx, 0, OFFcount)`, *OFFcount* ranges from 0 to 4096. By using different values of OFFcount, estimate the 0 and 180 degrees of your servo and update the SERVO_MIN and SERVO_MAX accordingly.
 
 **Calculations to Determine SERVO_MIN and SERVO_MAX**
 
-- Step 1: Refer to the datasheet to understand the pulse width requirements for your servo motor.
-- Step 2: Calculate PWM Values:
-    * PCA9685 PWM Resolution: The PCA9685 generates PWM signals with a 12-bit resolution, allowing for 4096 different PWM values (ranging from 0 to 4095) within one cycle.
-    * Pulse Width to PWM Value: The complete cycle is 20 ms (corresponding to a frequency of 50 Hz,  `PCA_Init(&hi2cx, 50)`), and this cycle is mapped to 4096 counts.
-- Step 3: Calculate the PWM Value for Minimum and Maximum Pulse Width:
-    * Convert pulse width to milliseconds. [if the pulse width is in µs (microseconds), convert it to ms (milliseconds)]
-    * Use the formula:<p>`PWM_value = (Pulse Width (ms) / Cycle Time (ms)) * 4096`
-- Example: 
-    * For a minimum pulse width of 400 µs: <p>`PWM_value (SERVO_MIN)  = (0.4 (ms) / 20 (ms)  ) * 4096 ≈ 82`
-    * For a maximum pulse width of 2400 µs: <p>`PWM_value (SERVO_MAX)  = (2.4 (ms) / 20 (ms)  ) * 4096 ≈ 491`      
+- `Step 1: Find Pulse Width Requirements for Your Servo.`
 
+    Check the datasheet for your servo to determine the required pulse width range. Typical servos operate between 500µs - 2500µs, but some use 400µs - 2400µs.
+- `Step 2: Understanding PCA9685 PWM Resolution`
+    * PCA9685 generates a 12-bit PWM signal with 4096 steps per cycle.
+    * At 50Hz (20ms period), each step is (20ms / 4096) = 4.88µs
+    * Use `PCA_Init(&hi2cx, 50)` to set 50Hz frequency.
+    * To convert pulse width (in milliseconds) to a PWM value:<p>`PWM_value = (Pulse Width (ms) / period (ms)) * 4096`
+- `Step 3: Example Calculations`
+    For a servo requiring 540µs - 2400µs pulse width:
+    * Convert pulse width to milliseconds. [if the pulse width is in µs (microseconds), convert it to ms (milliseconds)]
+    * 0° Position **(SERVO_MIN)**<p>`PWM_value = (0.54 (ms) / 20 (ms)) * 4096 = ~112`
+    * Convert pulse width to milliseconds. [if the pulse width is in µs (microseconds), convert it to ms (milliseconds)]
+    * 180° Position **(SERVO_MAX)**<p>`PWM_value = (2.4 (ms) / 20 (ms)) * 4096 = ~492`
+    
 
 
 ```c
 /* --- TIP --- */
-/* For servos with a Pulse Cycle of 20ms and a Pulse Width range of 400-2400µs, the above SERVO_MIN and SERVO_MAX are correct.
-To manually calculate, if you do not know the pulse width requirements for your servo motor (WHY?? refer to datasheet), 
+/* For servos with a Pulse Cycle of 20ms and a Pulse Width range of ~540µs-2.4ms, the above SERVO_MIN and SERVO_MAX are correct.
+
+If you don’t know your servo’s exact pulse width range, use the PCA_setPWM() function to manually adjust it.
+
 as a starting point, assign *OFFcount* the same as SERVO_MIN or SERVO_MAX to get an idea of how far your servo is from 0 degrees or 180 degrees and proceed from there. */
 
 PCA_setPWM(&hi2cx, PCA_PORTx, 0, SERVO_MIN) /* Should put your servo at 0 Degrees*/
@@ -74,6 +81,6 @@ PCA_setPWM(&hi2cx, PCA_PORTx, 0, SERVO_MIN) /* Should put your servo at 0 Degree
 PCA_setPWM(&hi2cx, PCA_PORTx, 0, SERVO_MAX) /* Should put your servo at 180 Degrees*/
 
 /* - Be careful not to put stress on your servos */
-/* - Let's say a value of SERVO_MIN as 82 puts your servo at 0 degrees; you must refrain from putting further stress on your servo by writing 81 or below. Same for SERVO_MAX. */
+/* - Let's say a value of SERVO_MIN as 112 puts your servo at 0 degrees; you must refrain from putting further stress on your servo by writing lower value. Same for SERVO_MAX. */
 
 ```
